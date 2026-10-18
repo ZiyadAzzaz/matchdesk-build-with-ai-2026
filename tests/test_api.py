@@ -4,6 +4,30 @@ from matchdesk.review import DATA, DEMO_MAPS
 from matchdesk.server import create_app
 
 
+def test_expired_cookie_cannot_mutate_a_new_workspace():
+    with TestClient(create_app()) as client:
+        client.cookies.set("matchdesk_session", "an-expired-session")
+        assert (
+            client.post(
+                "/api/approve",
+                json={
+                    "version": 0,
+                    "payment_id": "PAY-001",
+                    "invoice_ids": ["INV-003"],
+                    "acknowledged": True,
+                },
+            ).status_code
+            == 409
+        )
+        assert client.get("/api/state").json()["payments"][0]["status"] == "ambiguous"
+
+
+def test_unknown_routes_and_method_mismatch_are_not_silent_success():
+    with TestClient(create_app()) as client:
+        assert client.get("/api/approve").status_code == 405
+        assert client.post("/api/no-such-action", json={}).status_code == 405
+
+
 def test_complete_review_flow_and_stale_mutation():
     with TestClient(create_app()) as client:
         state = client.get("/api/state").json()

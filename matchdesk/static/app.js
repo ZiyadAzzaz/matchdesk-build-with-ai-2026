@@ -8,6 +8,10 @@ let selectedGroup = null;
 let importing = {};
 let preview = null;
 let busy = false;
+const noteDrafts = new Map();
+const importReads = new Map();
+const pendingImports = new Set();
+let importRevision = 0;
 
 function node(tag, cls, text) {
   const n = document.createElement(tag);
@@ -42,6 +46,8 @@ async function mutation(action, body={}, message='') {
   $('approve-button').disabled = true;
   try {
     state = await request(action, {version:state.version,...body});
+    if (['import','demo'].includes(action)) {noteDrafts.clear();selectedGroup=null;selectedId=state.payments[0]?.id||null;}
+    if (action==='evidence') noteDrafts.delete(body.payment_id);
     $('acknowledge').checked = false;
     if (!current()) selectedId = state.payments[0]?.id || null;
     render();
@@ -146,7 +152,7 @@ function renderInspector() {
   for (const customer of state.customers) $('scope-customer').add(new Option(customer,customer));
   $('scope-customer').value=payment.scope_customer;
   $('scope-customer').disabled=payment.status==='reviewed';
-  $('evidence-note').value=payment.note;
+  $('evidence-note').value=noteDrafts.get(payment.id)??payment.note;
   $('evidence-note').disabled=payment.status==='reviewed';
   $('save-note').disabled=payment.status==='reviewed';
   const summary=$('selection-summary');summary.replaceChildren();
@@ -158,7 +164,7 @@ function renderInspector() {
   $('undo-button').hidden=payment.status!=='reviewed';
   updateApproval();
 }
-function updateApproval() { $('approve-button').disabled=busy||!selectedGroup||!$('acknowledge').checked||current()?.status==='reviewed'; }
+function updateApproval() { $('approve-button').disabled=busy||!selectedGroup||!$('acknowledge').checked||current()?.status==='reviewed'||($('evidence-note').value!==(current()?.note??'')); }
 function render() {
   if(!state)return;
   $('demo-strip').hidden=!state.demo;
@@ -194,16 +200,22 @@ function history() {
 }
 
 async function readImport(role) {
+  const revision = (importReads.get(role)||0)+1;
+  importReads.set(role,revision);pendingImports.add(role);importRevision+=1;
+  $('preview-button').disabled=true;
   preview=null;$('mapping-area').hidden=true;$('import-confirm-area').hidden=true;$('replace-confirm').checked=false;
   $('import-error').hidden=true;delete importing[role];
   const file=$(role+'-file').files[0];
   try {
     if(file) {
       if(file.size>256000)throw new Error('Each CSV must be no larger than 256 KB.');
-      importing[role]=new TextDecoder('utf-8',{fatal:true}).decode(await file.arrayBuffer());
+      const data=await file.arrayBuffer();
+      if(importReads.get(role)!==revision)return;
+      importing[role]=new TextDecoder('utf-8',{fatal:true}).decode(data);
     }
-  } catch(error) {$('import-error').textContent=error.message;$('import-error').hidden=false;}
-  $('preview-button').disabled=!(importing.invoices&&importing.payments);
+  } catch(error) {if(importReads.get(role)===revision){$('import-error').textContent=error.message;$('import-error').hidden=false;}}
+  finally {if(importReads.get(role)===revision)pendingImports.delete(role);}
+  $('preview-button').disabled=pendingImports.size>0||!(importing.invoices&&importing.payments);
 }
 function mappingSelect(role,field,headers) {
   const label=node('label','',field==='id'?(role==='invoices'?'Invoice ID':'Payment ID'):field.charAt(0).toUpperCase()+field.slice(1));
@@ -217,9 +229,12 @@ function mappingSelect(role,field,headers) {
   label.append(select);return label;
 }
 async function previewImport() {
+  const revision=importRevision;
   $('preview-button').disabled=true;$('import-error').hidden=true;
   try {
-    preview=await request('preview',importing);$('mapping-area').replaceChildren();
+    const result=await request('preview',importing);
+    if(revision!==importRevision)return;
+    preview=result;$('mapping-area').replaceChildren();
     for(const role of ['invoices','payments']) {
       const group=node('section','mapping-group');group.append(node('h3','',`${role==='invoices'?'01 · Invoices':'02 · Payments'} · ${preview[role].records} records`));
       const fields=node('div','mapping-fields');
@@ -228,7 +243,7 @@ async function previewImport() {
     }
     $('mapping-area').hidden=false;$('import-confirm-area').hidden=false;$('replace-confirm').checked=false;$('commit-import').disabled=true;
   } catch(error) {$('import-error').textContent=error.message;$('import-error').hidden=false;}
-  finally {$('preview-button').disabled=false;}
+  finally {$('preview-button').disabled=pendingImports.size>0||!(importing.invoices&&importing.payments);}
 }
 async function commitImport() {
   if(!preview||!$('replace-confirm').checked)return;
@@ -244,6 +259,7 @@ for(const button of document.querySelectorAll('[data-close]'))button.addEventLis
 $('payment-search').addEventListener('input',()=>state&&renderQueue());
 $('payment-filter').addEventListener('change',()=>state&&renderQueue());
 $('acknowledge').addEventListener('change',updateApproval);
+$('evidence-note').addEventListener('input',()=>{if(selectedId)noteDrafts.set(selectedId,$('evidence-note').value);$('acknowledge').checked=false;updateApproval();});
 $('nav-review').addEventListener('click',()=>{$('payment-filter').value='all';$('payment-search').value='';if(state)renderQueue();$('workspace').scrollIntoView();});
 $('nav-sources').addEventListener('click',()=>sources('invoices'));
 $('source-invoices').addEventListener('click',()=>sources('invoices'));

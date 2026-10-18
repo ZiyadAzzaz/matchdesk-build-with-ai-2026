@@ -30,6 +30,10 @@ def create_app():
                 sessions.pop(key, None)
         token = request.cookies.get("matchdesk_session", "")
         if token not in sessions:
+            if token and request.method == "POST":
+                raise Conflict(
+                    "This session expired or the server restarted. Refresh and reload your files before reviewing again."
+                )
             if len(sessions) >= 128:
                 raise ValueError(
                     "Too many local workspaces. Restart the server to clear expired work."
@@ -45,9 +49,15 @@ def create_app():
         if host not in {"127.0.0.1", "localhost", "testserver"}:
             return JSONResponse({"error": "Use the local application address."}, status_code=403)
         action = request.path_params.get("action", "state")
-        allowed = {"state", "export.json", "export.csv"} if request.method == "GET" else {"preview", "demo", "import", "scope", "evidence", "approve", "undo"}
+        allowed = (
+            {"state", "export.json", "export.csv"}
+            if request.method == "GET"
+            else {"preview", "demo", "import", "scope", "evidence", "approve", "undo"}
+        )
         if action not in allowed:
-            return JSONResponse({"error": "Unknown action or unsupported request method."}, status_code=405)
+            return JSONResponse(
+                {"error": "Unknown action or unsupported request method."}, status_code=405
+            )
         try:
             body = {}
             if request.method == "POST":

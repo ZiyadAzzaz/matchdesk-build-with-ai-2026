@@ -42,6 +42,14 @@ def test_exact_money_scope_and_limits():
     assert not find_candidates(big, pay, "A", set())["complete"]
 
 
+def test_display_cap_does_not_turn_many_solutions_into_unique_match():
+    invoices = tuple(Row(str(i), "A", "USD", 100, "", i + 2) for i in range(16))
+    payment = Row("p", "A", "USD", 800, "", 2)
+    result = find_candidates(Dataset(invoices, (payment,), {}), payment, "A", set())
+    assert result["complete"] and result["status"] == "ambiguous"
+    assert result["count"] == 12870 and len(result["candidates"]) == 30
+
+
 @pytest.mark.parametrize(
     "text", ["", "id,id\na,b\n", "id,value\na,b,c\n", 'id,value\na,"broken', "id,value\na,\x00\n"]
 )

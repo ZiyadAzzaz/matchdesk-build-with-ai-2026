@@ -7,7 +7,7 @@ execution: authorized-under-delegation
 Fast mode explicitly requested. User authorized implementation; personal review is not fabricated. Official workflow is carried forward with delegated implementation instead of redundant interview pauses.
 
 ## Slices
-- [ ] **1. Review real computed alternatives in a running desk**
+- [x] **1. Review real computed alternatives in a running desk**
   Becomes usable: Fictional payments show computed invoice groups through the local API and custom workspace.
   Why now: Expose the actual ambiguous-match kernel before polish.
   PRD ref: `prd.md > Matching`, `prd.md > Screens and Layout`
@@ -16,7 +16,7 @@ Fast mode explicitly requested. User authorized implementation; personal review 
   Verify (mechanical): CSV/money/candidate tests, API state, frontend syntax and HTTP startup.
   Learner check: Open 8503 and compare the 200 versus 75+125 alternatives.
   Commit: `Build visual payment and invoice review desk`
-- [ ] **2. Confirm, correct and export without conflicting decisions**
+- [x] **2. Confirm, correct and export without conflicting decisions**
   Becomes usable: Evidence, explicit review, reservations, undo and matching exports work together.
   Why now: Demonstrates a complete decision loop rather than a matching calculator.
   PRD ref: `prd.md > Decisions and corrections`, `prd.md > Exports and privacy`
@@ -48,3 +48,6 @@ Fast mode explicitly requested. User authorized implementation; personal review 
 No personal activity or task-completion outcome is inferred from automated tests.
 
 ## Revisions
+- The original import interaction allowed a click while a replacement file was still being read. File reads and previews now carry revisions; changed inputs invalidate preview and confirmation, and stale read results cannot replace newer files.
+- Unsaved evidence notes survive candidate selection, and confirmation stays disabled until edited evidence is saved.
+- Connected-browser discovery returned no available browser. DOM interaction tests exercise the actual frontend against an isolated real API server; they do not inspect pixels, responsive layout or the native file chooser.

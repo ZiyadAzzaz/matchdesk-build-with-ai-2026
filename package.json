@@ -1,0 +1,14 @@
+{
+  "name": "matchdesk-ui-checks",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/frontend.test.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  }
+}
