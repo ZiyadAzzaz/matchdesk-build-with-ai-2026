@@ -197,6 +197,15 @@ test("search, unknown-customer scope and unsaved evidence have truthful controls
     assert.ok(
       d.querySelector("#payment-list").textContent.includes("No payments"),
     );
+    // Saving evidence starts a fresh preview even when the queue is filtered.
+    // Let that real response render before disposing the simulated document.
+    await waitFor(
+      () =>
+        d
+          .querySelector("#impact-preview")
+          .textContent.includes("If you confirm"),
+      "customer-scoped saved-note preview completed",
+    );
     assert.equal(p.errors.length, 0);
   } finally {
     p.dispose();
