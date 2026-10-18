@@ -1,5 +1,7 @@
 # Remaining release requirements
 
+Start with [final-handoff.md](final-handoff.md) for completed local work, concrete blockers and the technical recording sequence. Unchecked items below are deliberately not represented as completed.
+
 No publication or submission performed. Official sources: [rules](https://learn-ai-basics.devpost.com/rules), [overview](https://learn-ai-basics.devpost.com/), [required-question update](https://learn-ai-basics.devpost.com/updates/46821-two-new-questions-on-the-submission-form).
 
 - [ ] Participant personally tries the review desk; record actual observations and address failures.

@@ -45,6 +45,16 @@ Fast mode explicitly requested. User authorized implementation; personal review 
   Learner check: Use Guide me through it, compare both groups, inspect the consequences and explain the decision in your own words.
   Commit: `Explain payment choices with a guided review and consequence preview`
 
+- [x] **5. Preserve interaction state and prepare a clear release handoff**
+  Becomes usable: Selected cards retain focus; new evidence edits survive an older save; release and recording requirements are explicit.
+  Why now: Final interaction review found focus loss and an in-flight save race.
+  PRD ref: `prd.md > Decisions and corrections`, `prd.md > Screens and Layout`
+  Spec ref: `spec.md > Review desk`, `spec.md > Failure Modes and Verification`
+  Build: Focus restoration, draft-preserving save handling, history audit helper and technical timed recording/handoff docs.
+  Verify (mechanical): Real-API DOM regressions for focus and delayed save; backend suite; full history scan; source release integrity.
+  Learner check: Choose a card by keyboard, save a note while editing, and review final-handoff.md. Actual browser checks remain pending.
+  Commit: `Preserve review focus and evidence drafts and prepare release handoff`
+
 ## Participant feedback
 The participant said they did not understand the project and did not consider it strong enough to win. They authorized interactive improvements and delegated mechanical testing. This is actionable comprehension feedback, not acceptance, a user study or a completed personal walkthrough.
 

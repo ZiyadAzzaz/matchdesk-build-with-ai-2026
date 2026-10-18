@@ -217,6 +217,97 @@ async function setFile(p, role, text) {
     .dispatchEvent(new p.w.Event("change", { bubbles: true }));
 }
 
+test("selecting payment and invoice cards retains focus on the selected control", async () => {
+  const p = await page();
+  try {
+    const { w, d } = p;
+    const payment = d.querySelectorAll(".payment-row")[1];
+    payment.focus();
+    payment.click();
+    assert.ok(d.activeElement.classList.contains("payment-row"));
+    assert.equal(d.activeElement.getAttribute("aria-pressed"), "true");
+    const allocation = d.querySelector(".allocation");
+    allocation.focus();
+    allocation.click();
+    assert.ok(d.activeElement.classList.contains("allocation"));
+    assert.equal(d.activeElement.getAttribute("aria-pressed"), "true");
+    await waitFor(
+      () =>
+        d
+          .querySelector("#impact-preview")
+          .textContent.includes("If you confirm"),
+      "focus test preview completed",
+    );
+    assert.equal(p.errors.length, 0);
+  } finally {
+    p.dispose();
+  }
+});
+
+test("editing an evidence note while its older save is pending preserves the new draft", async () => {
+  const p = await page();
+  let release;
+  try {
+    const { w, d } = p;
+    const realFetch = w.fetch;
+    let held = false;
+    const gate = new Promise((resolve) => {
+      release = resolve;
+    });
+    w.fetch = async (path, options) => {
+      const response = await realFetch(path, options);
+      if (path === "/api/evidence") {
+        held = true;
+        await gate;
+      }
+      return response;
+    };
+    click(w, ".allocation");
+    input(w, "#evidence-note", "The first saved note.");
+    click(w, "#save-note");
+    await waitFor(() => held, "older save accepted by server");
+    input(w, "#evidence-note", "A newer draft typed while saving.");
+    release();
+    await waitFor(
+      () => !d.querySelector("#notice").hidden,
+      "save response rendered",
+    );
+    assert.equal(
+      d.querySelector("#evidence-note").value,
+      "A newer draft typed while saving.",
+    );
+    assert.match(
+      d.querySelector("#evidence-card").textContent,
+      /The first saved note/,
+    );
+    click(w, "#acknowledge");
+    assert.ok(
+      d.querySelector("#approve-button").disabled,
+      "newer unsaved draft must be saved before confirmation",
+    );
+    w.fetch = realFetch;
+    click(w, "#save-note");
+    await waitFor(
+      () =>
+        d.querySelector("#evidence-card").textContent.includes("A newer draft"),
+      "new draft saved explicitly",
+    );
+    click(w, "#acknowledge");
+    assert.equal(d.querySelector("#approve-button").disabled, false);
+    await waitFor(
+      () =>
+        d
+          .querySelector("#impact-preview")
+          .textContent.includes("If you confirm"),
+      "latest saved-note preview completed",
+    );
+    assert.equal(p.errors.length, 0);
+  } finally {
+    release?.();
+    p.dispose();
+  }
+});
+
 test("guided first payment explains the choice without selecting or confirming for the user", async () => {
   const p = await page();
   try {

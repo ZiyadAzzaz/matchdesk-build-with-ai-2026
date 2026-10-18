@@ -10,3 +10,21 @@ The participant writes their own final narration/name/submission under the Skill
 6. If time permits, show own-file preview and column mapping or the unresolved-customer case. Keep the main loop legible.
 
 Use a short video showing working software (judges are not required to watch beyond three minutes). Mark all fictional examples, show that review is local and no real ledger is updated, and avoid exposing real records. No time savings, adoption or testimonial is established. Runtime needs no AI key and no bank connection. If recording fails, restart the sample and repeat; preserve a factual earlier recording rather than simulate behavior.
+
+## Suggested capture timing — actions only
+
+This is a technical shot list, not narration or text for the public submission. The participant explains the task and their learning in their own words.
+
+| Elapsed | Actual screen action | Evidence that must be legible |
+|---|---|---|
+| 0–15 seconds | Show the sample workspace and PAY-001 | Intended task and fictional-data label |
+| 15–40 | Compare both allocation cards | 200 versus 75 + 125; both exact totals |
+| 40–65 | Open remittance, read references, save evidence | INV-001 and INV-002 in the actual note |
+| 65–100 | Select the pair; inspect Understand this choice | Source records, equation, predicted effect on PAY-005 |
+| 100–130 | Acknowledge, confirm, inspect affected payment | PAY-005 has no remaining group; no external posting |
+| 130–155 | Return to PAY-001 and undo; inspect trail/export | Invoices available again and truthful decision history |
+| 155–165 | Finish in the app | Participant's own learning and supported scope |
+
+Allow about 15 seconds of buffer before three minutes. Drop optional source/export detail if it obscures the main task. Do not speed through unreadable amounts just to show more features.
+
+Before recording: use only fictional data, reset intentionally if needed, close unrelated tabs and notifications, choose a readable viewport/zoom and verify the local app is healthy. Make a short audio/capture trial and play it back. After recording, watch the actual exported file from start to finish, check duration, readable amounts and audio/captions, and verify the uploaded video is publicly accessible while signed out. No recording or upload has been performed by this checklist.

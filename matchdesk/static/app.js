@@ -126,7 +126,8 @@ async function mutation(action, body = {}, message = "") {
       selectedGroup = null;
       selectedId = state.payments[0]?.id || null;
     }
-    if (action === "evidence") noteDrafts.delete(body.payment_id);
+    if (action === "evidence" && noteDrafts.get(body.payment_id) === body.note)
+      noteDrafts.delete(body.payment_id);
     $("acknowledge").checked = false;
     if (!current()) selectedId = state.payments[0]?.id || null;
     render();
@@ -209,6 +210,9 @@ function renderQueue() {
       $("acknowledge").checked = false;
       $("notice").hidden = true;
       render();
+      document
+        .querySelector('.payment-row[aria-pressed="true"]')
+        ?.focus({ preventScroll: true });
     });
     $("payment-list").append(button);
   }
@@ -462,6 +466,9 @@ function renderPayment() {
       $("acknowledge").checked = false;
       renderPayment();
       renderInspector();
+      document
+        .querySelector('.allocation[aria-pressed="true"]')
+        ?.focus({ preventScroll: true });
     });
     $("candidate-list").append(button);
   });
