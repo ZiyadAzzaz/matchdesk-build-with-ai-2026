@@ -1,8 +1,48 @@
-# MatchDesk — local payment review (working prototype)
+# MatchDesk
 
-Compare incoming payments with outstanding invoices, inspect multiple exact allocations, add evidence, and confirm a proposed match without updating any bank or accounting system. The interface is a custom HTML/CSS/JavaScript review desk with a small local Python API. AI assisted the build; runtime matching is deterministic. No API key, account or frontend build step is needed.
+A local payment-review workspace for freelancers, bookkeepers and small businesses working from invoice and payment CSV exports. MatchDesk shows which invoice groups fit a payment, lets a person inspect the evidence and consequences, and records their proposed allocation.
+
+**Project owner and contributor:** [Ziyad Azzaz (@ZiyadAzzaz)](https://github.com/ZiyadAzzaz). Built with AI coding assistance; see [contributors and attribution](AUTHORS.md).
 
 Public source: [ZiyadAzzaz/matchdesk-build-with-ai-2026](https://github.com/ZiyadAzzaz/matchdesk-build-with-ai-2026). See [release handoff](devpost/final-handoff.md) for completed checks and remaining demo/submission work.
+
+## What problem does it solve?
+
+An invoice is a request for payment. Receiving money does not always tell a business which invoices the customer intended to pay. A missing reference or several matching amounts can leave a reviewer comparing spreadsheet rows and checking the customer's payment note, also called a remittance.
+
+For example, a customer has three outstanding invoices:
+
+| Invoice | Amount |
+|---|---:|
+| INV-001 | USD 75.00 |
+| INV-002 | USD 125.00 |
+| INV-003 | USD 200.00 |
+
+A **USD 200.00 payment** fits INV-003 **or** INV-001 + INV-002. Both sums are correct. The customer's note supplies the context needed to decide. MatchDesk keeps those alternatives visible, connects the choice to source records and evidence, and shows what would happen to the other payments in the batch before confirmation.
+
+## Why this project?
+
+This prototype focuses on one complete review task: import files → compare alternatives → inspect evidence and consequences → confirm → export or undo. Its purpose is to make the reasoning inspectable and prevent the same invoice being reused across locally reviewed allocations. The guided fictional example makes the task approachable without connecting a bank or entering real customer data.
+
+Public discussions informed the problem choice:
+
+- A [small-business Reddit discussion](https://www.reddit.com/r/smallbusiness/comments/1sergd6/dealing_with_messy_payment_reconciliation_how_do/) describes missing invoice references, mismatched payer names and manual cross-checking between records.
+- A [QuickBooks Reddit question](https://www.reddit.com/r/QuickBooks/comments/1ksckhr/) asks how to identify the right customer when several invoices have the same amount.
+
+These are examples of a **recurring reported workflow problem**, not evidence that it is the most common problem on Reddit. They do not validate MatchDesk, measure prevalence or establish time saved. Some issues mentioned in those threads, such as partial payments, remain outside this prototype. See the [evidence and existing-solutions review](docs/problem-evidence.md).
+
+## What you can do
+
+| Action | What the app actually does |
+|---|---|
+| Import two CSV files | Preview columns, map fields and reject invalid imports without replacing the current review |
+| Compare possible matches | Compute exact invoice groups within the selected customer and currency |
+| Inspect the reasoning | Show amounts, original CSV records and saved invoice references |
+| Preview a decision | Apply the actual allocation rules to a copy and show affected payments without reserving anything |
+| Confirm or undo | Require a human acknowledgment, reserve invoices locally, and keep a decision trail |
+| Export the review | Download proposed allocations as CSV or detailed evidence/history as JSON |
+
+The interface uses HTML/CSS/JavaScript with a small Python API. Matching is deterministic; no API key, account or frontend build step is needed. Confirmations stay in this workspace: no money moves and no accounting ledger is updated. Established accounting and reconciliation tools already cover related tasks; this is a focused prototype whose usability advantage still needs evaluation.
 
 ## Open the app
 
@@ -11,6 +51,8 @@ In this workspace, **double-click `Start-MatchDesk.cmd`**. It discovers a local 
 Fresh setup, Python 3.11:
 
 ```powershell
+git clone https://github.com/ZiyadAzzaz/matchdesk-build-with-ai-2026.git
+cd matchdesk-build-with-ai-2026
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
 .\.venv\Scripts\python.exe -m matchdesk --open-browser
@@ -20,7 +62,7 @@ Linux/macOS use `.venv/bin/python`. Existing workspace alternative:
 
 ```powershell
 conda activate zero-dev
-cd "E:\Azzaz CAI\Azzaz-Lab\zero-dev\matchdesk"
+cd "path\to\matchdesk-build-with-ai-2026"
 python -m matchdesk
 ```
 
