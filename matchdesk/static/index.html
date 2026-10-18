@@ -1,40 +1,382 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>MatchDesk · Payment review</title><link rel="stylesheet" href="/static/styles.css"><script src="/static/app.js" defer></script></head>
-<body>
-<a class="skip" href="#workspace">Skip to payment review</a>
-<aside class="rail">
-  <a class="brand" href="/" aria-label="MatchDesk home"><span class="brand-mark">m<span>·</span></span><span>MatchDesk<small>A little clarity goes a long way.</small></span></a>
-  <p class="rail-label">YOUR WORKSPACE</p>
-  <nav aria-label="Workspace"><button class="nav-item active" id="nav-review"><span>▦</span> Review queue <span id="rail-count" class="rail-count">—</span></button><button class="nav-item" id="nav-sources"><span>▤</span> Source files</button><button class="nav-item" id="nav-history"><span>↺</span> Decision trail</button></nav>
-  <div class="rail-note"><span class="live-dot"></span><strong>Local workspace</strong><p>Your review stays in this app’s memory. No bank connection. Nothing posted.</p><button id="about-button" class="rail-link">How MatchDesk works ↗</button></div>
-  <button id="restart-button" class="restart">↻ &nbsp; Restart with example</button>
-  <p class="rail-bottom">WORKING PROTOTYPE · v0.1</p>
-</aside>
-<main id="workspace">
-  <header class="topbar"><div class="breadcrumbs">Workspace <span>/</span> Payment review</div><span class="privacy-label"><span class="live-dot"></span> No external posting</span></header>
-  <section class="page-heading"><div><p class="eyebrow">LESS GUESSWORK. MORE CONTEXT.</p><h1>Make every match make sense.</h1><p class="subtitle">Compare the possibilities. Keep the evidence. Make the call.</p></div><div class="heading-actions"><button class="button" id="import-button">↑ &nbsp; Import CSVs</button><details class="export-menu"><summary class="button primary">↓ &nbsp; Export review</summary><div class="menu-content"><a href="/api/export.csv" download>Proposed allocations · CSV</a><a href="/api/export.json" download>Evidence & decision trail · JSON</a></div></details></div></section>
-  <div id="notice" class="notice" role="status" hidden></div>
-  <div id="error" class="error" role="alert" hidden><span id="error-text"></span><button id="retry-button" class="text-button">Refresh workspace</button></div>
-  <div class="demo-strip" id="demo-strip"><span class="sample-tag">SAMPLE WORKSPACE</span><p>These records are fictional. Start with the <strong>USD 200.00</strong> payment to explore a real ambiguity.</p><button id="start-demo" class="text-button">Show me →</button></div>
-  <section class="stats" aria-label="Workspace summary"><article><span>Incoming payments</span><strong id="stat-payments">—</strong><small>In this review batch</small></article><article><span>Reviewed here</span><strong id="stat-reviewed">—</strong><small>Proposed allocations confirmed</small></article><article><span>Need attention</span><strong id="stat-attention">—</strong><small>Ambiguous, unmatched or unclear</small></article><article><span>Available invoices</span><strong id="stat-invoices">—</strong><small>Not reserved by a review</small></article></section>
-  <div class="review-grid">
-    <section class="queue panel" aria-labelledby="queue-heading"><div class="panel-heading"><h2 id="queue-heading">Incoming payments</h2><span id="queue-count" class="count-bubble">—</span></div><div class="queue-tools"><label class="sr-only" for="payment-search">Search payments</label><input id="payment-search" type="search" placeholder="Search payments or customers…"><label class="sr-only" for="payment-filter">Filter payments</label><select id="payment-filter"><option value="all">All payments</option><option value="attention">Needs attention</option><option value="suggested">One candidate</option><option value="reviewed">Reviewed</option></select></div><div id="payment-list" class="payment-list" aria-label="Payments"><p class="empty">Loading your workspace…</p></div><div class="queue-footer">Select a payment to see its possibilities.</div></section>
-    <section class="match-area" aria-label="Allocation alternatives"><div id="payment-detail" class="panel payment-detail"></div><div id="evidence-card" class="evidence-card" hidden></div><div class="alternatives-heading"><div><p class="eyebrow">THE POSSIBILITIES</p><h2>Which invoices does it cover?</h2></div><span id="candidate-count" class="count-bubble">—</span></div><p id="candidate-explanation" class="muted"></p><div id="candidate-list"></div></section>
-    <aside class="inspector panel" aria-labelledby="inspector-heading"><div class="panel-heading"><h2 id="inspector-heading">Your review</h2><span class="review-icon">✓</span></div><div class="inspector-body"><label for="scope-customer">Match against customer</label><select id="scope-customer"><option value="">Choose a customer…</option></select><p class="field-help">A review scope, not an automatic payer identification.</p><div class="divider"></div><label for="evidence-note">Evidence note <span class="optional">optional</span></label><textarea id="evidence-note" maxlength="2000" rows="4" placeholder="What tells you which invoices were paid? Add a remittance reference or review note."></textarea><button id="save-note" class="button small">Save evidence note</button><div class="divider"></div><div id="selection-summary" class="selection-summary">Choose an allocation to review.</div><label class="check-label"><input type="checkbox" id="acknowledge"><span>I checked the payer and remittance evidence.</span></label><button id="approve-button" class="button primary full" disabled>Confirm proposed allocation</button><button id="undo-button" class="button full" hidden>↶ Undo this review</button><p class="decision-boundary">Confirmed here only. No payment is sent and no accounting entry is posted.</p></div></aside>
-  </div>
-  <footer class="page-footer"><span>Exact amounts. Visible alternatives. Human decisions.</span><button id="limits-button" class="text-button">Supported scope & privacy ↗</button></footer>
-</main>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MatchDesk · Payment review</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#workspace">Skip to payment review</a>
+    <aside class="rail">
+      <a class="brand" href="/" aria-label="MatchDesk home"
+        ><span class="brand-mark">m<span>·</span></span
+        ><span
+          >MatchDesk<small>A little clarity goes a long way.</small></span
+        ></a
+      >
+      <p class="rail-label">YOUR WORKSPACE</p>
+      <nav aria-label="Workspace">
+        <button class="nav-item active" id="nav-review">
+          <span>▦</span> Review queue
+          <span id="rail-count" class="rail-count">—</span></button
+        ><button class="nav-item" id="nav-sources">
+          <span>▤</span> Source files</button
+        ><button class="nav-item" id="nav-history">
+          <span>↺</span> Decision trail
+        </button>
+      </nav>
+      <div class="rail-note">
+        <span class="live-dot"></span><strong>Local workspace</strong>
+        <p>
+          Your review stays in this app’s memory. No bank connection. Nothing
+          posted.
+        </p>
+        <button id="about-button" class="rail-link">
+          How MatchDesk works ↗
+        </button>
+      </div>
+      <button id="restart-button" class="restart">
+        ↻ &nbsp; Restart with example
+      </button>
+      <p class="rail-bottom">WORKING PROTOTYPE · v0.1</p>
+    </aside>
+    <main id="workspace">
+      <header class="topbar">
+        <div class="breadcrumbs">Workspace <span>/</span> Payment review</div>
+        <span class="privacy-label"
+          ><span class="live-dot"></span> No external posting</span
+        >
+      </header>
+      <section class="page-heading">
+        <div>
+          <p class="eyebrow">LESS GUESSWORK. MORE CONTEXT.</p>
+          <h1>Make every match make sense.</h1>
+          <p class="subtitle">
+            Compare the possibilities. Keep the evidence. Make the call.
+          </p>
+        </div>
+        <div class="heading-actions">
+          <button class="button" id="import-button">
+            ↑ &nbsp; Import CSVs
+          </button>
+          <details class="export-menu">
+            <summary class="button primary">↓ &nbsp; Export review</summary>
+            <div class="menu-content">
+              <a href="/api/export.csv" download>Proposed allocations · CSV</a
+              ><a href="/api/export.json" download
+                >Evidence & decision trail · JSON</a
+              >
+            </div>
+          </details>
+        </div>
+      </section>
+      <div id="notice" class="notice" role="status" hidden></div>
+      <div id="error" class="error" role="alert" hidden>
+        <span id="error-text"></span
+        ><button id="retry-button" class="text-button">
+          Refresh workspace
+        </button>
+      </div>
+      <div class="demo-strip" id="demo-strip">
+        <span class="sample-tag">SAMPLE WORKSPACE</span>
+        <p>
+          These records are fictional. Start with the
+          <strong>USD 200.00</strong> payment to explore a real ambiguity.
+        </p>
+        <button id="start-demo" class="text-button">Show me →</button>
+      </div>
+      <section class="stats" aria-label="Workspace summary">
+        <article>
+          <span>Incoming payments</span><strong id="stat-payments">—</strong
+          ><small>In this review batch</small>
+        </article>
+        <article>
+          <span>Reviewed here</span><strong id="stat-reviewed">—</strong
+          ><small>Proposed allocations confirmed</small>
+        </article>
+        <article>
+          <span>Need attention</span><strong id="stat-attention">—</strong
+          ><small>Ambiguous, unmatched or unclear</small>
+        </article>
+        <article>
+          <span>Available invoices</span><strong id="stat-invoices">—</strong
+          ><small>Not reserved by a review</small>
+        </article>
+      </section>
+      <div class="review-grid">
+        <section class="queue panel" aria-labelledby="queue-heading">
+          <div class="panel-heading">
+            <h2 id="queue-heading">Incoming payments</h2>
+            <span id="queue-count" class="count-bubble">—</span>
+          </div>
+          <div class="queue-tools">
+            <label class="sr-only" for="payment-search">Search payments</label
+            ><input
+              id="payment-search"
+              type="search"
+              placeholder="Search payments or customers…"
+            /><label class="sr-only" for="payment-filter">Filter payments</label
+            ><select id="payment-filter">
+              <option value="all">All payments</option>
+              <option value="attention">Needs attention</option>
+              <option value="suggested">One candidate</option>
+              <option value="reviewed">Reviewed</option>
+            </select>
+          </div>
+          <div id="payment-list" class="payment-list" aria-label="Payments">
+            <p class="empty">Loading your workspace…</p>
+          </div>
+          <div class="queue-footer">
+            Select a payment to see its possibilities.
+          </div>
+        </section>
+        <section class="match-area" aria-label="Allocation alternatives">
+          <div id="payment-detail" class="panel payment-detail"></div>
+          <div id="evidence-card" class="evidence-card" hidden></div>
+          <div class="alternatives-heading">
+            <div>
+              <p class="eyebrow">THE POSSIBILITIES</p>
+              <h2>Which invoices does it cover?</h2>
+            </div>
+            <span id="candidate-count" class="count-bubble">—</span>
+          </div>
+          <p id="candidate-explanation" class="muted"></p>
+          <div id="candidate-list"></div>
+        </section>
+        <aside class="inspector panel" aria-labelledby="inspector-heading">
+          <div class="panel-heading">
+            <h2 id="inspector-heading">Your review</h2>
+            <span class="review-icon">✓</span>
+          </div>
+          <div class="inspector-body">
+            <label for="scope-customer">Match against customer</label
+            ><select id="scope-customer">
+              <option value="">Choose a customer…</option>
+            </select>
+            <p class="field-help">
+              A review scope, not an automatic payer identification.
+            </p>
+            <div class="divider"></div>
+            <label for="evidence-note"
+              >Evidence note <span class="optional">optional</span></label
+            ><textarea
+              id="evidence-note"
+              maxlength="2000"
+              rows="4"
+              placeholder="What tells you which invoices were paid? Add a remittance reference or review note."
+            ></textarea
+            ><button id="save-note" class="button small">
+              Save evidence note
+            </button>
+            <div class="divider"></div>
+            <div id="selection-summary" class="selection-summary">
+              Choose an allocation to review.
+            </div>
+            <label class="check-label"
+              ><input type="checkbox" id="acknowledge" /><span
+                >I checked the payer and remittance evidence.</span
+              ></label
+            ><button id="approve-button" class="button primary full" disabled>
+              Confirm proposed allocation</button
+            ><button id="undo-button" class="button full" hidden>
+              ↶ Undo this review
+            </button>
+            <p class="decision-boundary">
+              Confirmed here only. No payment is sent and no accounting entry is
+              posted.
+            </p>
+          </div>
+        </aside>
+      </div>
+      <footer class="page-footer">
+        <span>Exact amounts. Visible alternatives. Human decisions.</span
+        ><button id="limits-button" class="text-button">
+          Supported scope & privacy ↗
+        </button>
+      </footer>
+    </main>
 
-<dialog id="import-dialog" class="wide-dialog" aria-labelledby="import-title"><div class="dialog-top"><div><p class="eyebrow">BRING YOUR OWN EXPORTS</p><h2 id="import-title">Two files. One clear review.</h2></div><button class="close-button" data-close="import-dialog" aria-label="Close import">×</button></div><p class="muted">Choose UTF-8, comma-separated CSVs. Preview your columns before importing. Current workspace data will be replaced only after a successful import.</p><div class="upload-grid"><label class="upload-box">01 · Outstanding invoices<input type="file" id="invoices-file" accept=".csv,text/csv"><small>Up to 200 records · 256 KB</small><a href="/samples/invoices.csv" download>Download example template ↗</a></label><label class="upload-box">02 · Incoming payments<input type="file" id="payments-file" accept=".csv,text/csv"><small>Up to 60 records · 256 KB</small><a href="/samples/payments.csv" download>Download example template ↗</a></label></div><p id="import-error" class="inline-error" role="alert" hidden></p><button id="preview-button" class="button primary" disabled>Preview files & choose columns →</button><div id="mapping-area" hidden></div><div id="import-confirm-area" hidden><label class="check-label"><input id="replace-confirm" type="checkbox"><span>Replace the current workspace, including its review decisions.</span></label><button id="commit-import" class="button primary" disabled>Import into review desk →</button></div></dialog>
+    <dialog
+      id="import-dialog"
+      class="wide-dialog"
+      aria-labelledby="import-title"
+    >
+      <div class="dialog-top">
+        <div>
+          <p class="eyebrow">BRING YOUR OWN EXPORTS</p>
+          <h2 id="import-title">Two files. One clear review.</h2>
+        </div>
+        <button
+          class="close-button"
+          data-close="import-dialog"
+          aria-label="Close import"
+        >
+          ×
+        </button>
+      </div>
+      <p class="muted">
+        Choose UTF-8, comma-separated CSVs. Preview your columns before
+        importing. Current workspace data will be replaced only after a
+        successful import.
+      </p>
+      <div class="upload-grid">
+        <label class="upload-box"
+          >01 · Outstanding invoices<input
+            type="file"
+            id="invoices-file"
+            accept=".csv,text/csv"
+          /><small>Up to 200 records · 256 KB</small
+          ><a href="/samples/invoices.csv" download
+            >Download example template ↗</a
+          ></label
+        ><label class="upload-box"
+          >02 · Incoming payments<input
+            type="file"
+            id="payments-file"
+            accept=".csv,text/csv"
+          /><small>Up to 60 records · 256 KB</small
+          ><a href="/samples/payments.csv" download
+            >Download example template ↗</a
+          ></label
+        >
+      </div>
+      <p id="import-error" class="inline-error" role="alert" hidden></p>
+      <button id="preview-button" class="button primary" disabled>
+        Preview files & choose columns →
+      </button>
+      <div id="mapping-area" hidden></div>
+      <div id="import-confirm-area" hidden>
+        <label class="check-label"
+          ><input id="replace-confirm" type="checkbox" /><span
+            >Replace the current workspace, including its review
+            decisions.</span
+          ></label
+        ><button id="commit-import" class="button primary" disabled>
+          Import into review desk →
+        </button>
+      </div>
+    </dialog>
 
-<dialog id="source-dialog" class="wide-dialog" aria-labelledby="source-title"><div class="dialog-top"><div><p class="eyebrow">THE ORIGINAL ROWS</p><h2 id="source-title">Source files</h2></div><button class="close-button" data-close="source-dialog" aria-label="Close sources">×</button></div><div class="tabs"><button id="source-invoices" class="button small">Invoices</button><button id="source-payments" class="button small">Payments</button></div><div id="source-table" class="table-scroll"></div><p id="source-hash" class="hash-note"></p></dialog>
+    <dialog
+      id="source-dialog"
+      class="wide-dialog"
+      aria-labelledby="source-title"
+    >
+      <div class="dialog-top">
+        <div>
+          <p class="eyebrow">THE ORIGINAL ROWS</p>
+          <h2 id="source-title">Source files</h2>
+        </div>
+        <button
+          class="close-button"
+          data-close="source-dialog"
+          aria-label="Close sources"
+        >
+          ×
+        </button>
+      </div>
+      <div class="tabs">
+        <button id="source-invoices" class="button small">Invoices</button
+        ><button id="source-payments" class="button small">Payments</button>
+      </div>
+      <div id="source-table" class="table-scroll"></div>
+      <p id="source-hash" class="hash-note"></p>
+    </dialog>
 
-<dialog id="history-dialog" class="wide-dialog" aria-labelledby="history-title"><div class="dialog-top"><div><p class="eyebrow">KEEP THE REASONING</p><h2 id="history-title">Decision trail</h2></div><button class="close-button" data-close="history-dialog" aria-label="Close trail">×</button></div><div id="history-list"></div></dialog>
+    <dialog
+      id="history-dialog"
+      class="wide-dialog"
+      aria-labelledby="history-title"
+    >
+      <div class="dialog-top">
+        <div>
+          <p class="eyebrow">KEEP THE REASONING</p>
+          <h2 id="history-title">Decision trail</h2>
+        </div>
+        <button
+          class="close-button"
+          data-close="history-dialog"
+          aria-label="Close trail"
+        >
+          ×
+        </button>
+      </div>
+      <div id="history-list"></div>
+    </dialog>
 
-<dialog id="remittance-dialog" aria-labelledby="remittance-title"><div class="dialog-top"><div><p class="eyebrow">FICTIONAL SUPPORTING EVIDENCE</p><h2 id="remittance-title">The missing context</h2></div><button class="close-button" data-close="remittance-dialog" aria-label="Close remittance">×</button></div><p id="remittance-text" class="remittance-paper"></p><p class="muted">This example note names the invoices. It does not authenticate the payer or post a payment.</p><button id="apply-remittance" class="button primary full">Use this evidence note →</button></dialog>
+    <dialog id="remittance-dialog" aria-labelledby="remittance-title">
+      <div class="dialog-top">
+        <div>
+          <p class="eyebrow">FICTIONAL SUPPORTING EVIDENCE</p>
+          <h2 id="remittance-title">The missing context</h2>
+        </div>
+        <button
+          class="close-button"
+          data-close="remittance-dialog"
+          aria-label="Close remittance"
+        >
+          ×
+        </button>
+      </div>
+      <p id="remittance-text" class="remittance-paper"></p>
+      <p class="muted">
+        This example note names the invoices. It does not authenticate the payer
+        or post a payment.
+      </p>
+      <button id="apply-remittance" class="button primary full">
+        Use this evidence note →
+      </button>
+    </dialog>
 
-<dialog id="about-dialog" aria-labelledby="about-title"><div class="dialog-top"><div><p class="eyebrow">A SMALL, HONEST WORKSPACE</p><h2 id="about-title">You stay in control.</h2></div><button class="close-button" data-close="about-dialog" aria-label="Close scope and privacy">×</button></div><div id="limitations-list"></div><p class="muted">Supported currencies: USD, EUR, GBP, EGP, CAD and AUD. Matching uses exact customer scope and currency. No fuzzy identities, accounting advice or paid AI service.</p><p class="muted">The browser sends files to this app’s server. When run locally, that is this computer. Files are not sent to a bank or AI API. Session data expires after 90 minutes without API activity and is lost on server restart. This prototype is intended for local use, not a public financial service.</p></dialog>
+    <dialog id="about-dialog" aria-labelledby="about-title">
+      <div class="dialog-top">
+        <div>
+          <p class="eyebrow">A SMALL, HONEST WORKSPACE</p>
+          <h2 id="about-title">You stay in control.</h2>
+        </div>
+        <button
+          class="close-button"
+          data-close="about-dialog"
+          aria-label="Close scope and privacy"
+        >
+          ×
+        </button>
+      </div>
+      <div id="limitations-list"></div>
+      <p class="muted">
+        Supported currencies: USD, EUR, GBP, EGP, CAD and AUD. Matching uses
+        exact customer scope and currency. No fuzzy identities, accounting
+        advice or paid AI service.
+      </p>
+      <p class="muted">
+        The browser sends files to this app’s server. When run locally, that is
+        this computer. Files are not sent to a bank or AI API. Session data
+        expires after 90 minutes without API activity and is lost on server
+        restart. This prototype is intended for local use, not a public
+        financial service.
+      </p>
+    </dialog>
 
-<dialog id="reset-dialog" aria-labelledby="reset-title"><div class="dialog-top"><h2 id="reset-title">Start a fresh example?</h2><button class="close-button" data-close="reset-dialog" aria-label="Cancel restart">×</button></div><p>Current files, evidence notes and review decisions will be replaced by the fictional sample. Export your review first if you want to keep it.</p><button id="confirm-reset" class="button primary full">Replace with fictional sample</button></dialog>
-</body></html>
+    <dialog id="reset-dialog" aria-labelledby="reset-title">
+      <div class="dialog-top">
+        <h2 id="reset-title">Start a fresh example?</h2>
+        <button
+          class="close-button"
+          data-close="reset-dialog"
+          aria-label="Cancel restart"
+        >
+          ×
+        </button>
+      </div>
+      <p>
+        Current files, evidence notes and review decisions will be replaced by
+        the fictional sample. Export your review first if you want to keep it.
+      </p>
+      <button id="confirm-reset" class="button primary full">
+        Replace with fictional sample
+      </button>
+    </dialog>
+  </body>
+</html>

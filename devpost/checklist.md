@@ -25,7 +25,7 @@ Fast mode explicitly requested. User authorized implementation; personal review 
   Verify (mechanical): End-to-end API loop, reservation conflicts/undo, stale revision, isolation and export safety.
   Learner check: Apply sample evidence, confirm the pair and inspect the resulting report.
   Commit: `Add evidence-backed review decisions and exports`
-- [ ] **3. Import own files and deliver a reproducible project**
+- [x] **3. Import own files and deliver a reproducible project**
   Becomes usable: Preview/mapping/import, source tables, launcher and documented release.
   Why now: Proves input behavior beyond the curated demo.
   PRD ref: `prd.md > Imports`, `prd.md > Acceptance Criteria`
@@ -43,7 +43,7 @@ Fast mode explicitly requested. User authorized implementation; personal review 
 - [ ] Requested revisions verified and participant confirms ready
 
 ## Code Tour and App Map
-- [ ] Reference app map generated and checked
+- [x] Reference app map generated and checked
 - [ ] Personal learning activity/reflection completed or declined
 No personal activity or task-completion outcome is inferred from automated tests.
 
