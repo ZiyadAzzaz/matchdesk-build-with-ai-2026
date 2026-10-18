@@ -1,0 +1,8 @@
+invoice_id,customer,currency,amount
+INV-001,Northstar Studio,USD,75.00
+INV-002,Northstar Studio,USD,125.00
+INV-003,Northstar Studio,USD,200.00
+INV-004,Willow Design,USD,120.00
+INV-005,Willow Design,USD,180.00
+INV-006,Harbor Works,USD,450.00
+INV-007,Northstar Studio,USD,95.00

@@ -1,0 +1,6 @@
+payment_id,customer,currency,amount,reference
+PAY-001,Northstar Studio,USD,200.00,Bank transfer / no invoice reference
+PAY-002,Willow Design,USD,300.00,Project payment
+PAY-003,Harbor Works,USD,451.00,Transfer received
+PAY-004,,USD,95.00,Payer name requires review
+PAY-005,Northstar Studio,USD,75.00,Possible competing allocation

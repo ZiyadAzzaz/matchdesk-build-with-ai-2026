@@ -1,0 +1,5 @@
+{
+  "payment_id": "PAY-001",
+  "invoice_ids": ["INV-001", "INV-002"],
+  "note": "FICTIONAL REMITTANCE — Northstar Studio identifies INV-001 (75.00 USD) and INV-002 (125.00 USD) for its 200.00 USD transfer. This invented example is for demonstration only."
+}

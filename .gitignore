@@ -1,0 +1,15 @@
+/devpost/learner-profile.md
+.env
+.env.*
+!.env.example
+.agents/
+.claude/
+agent/
+.dist/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+uploads/
+node_modules/
