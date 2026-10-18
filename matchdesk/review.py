@@ -3,6 +3,7 @@
 import csv
 import io
 import json
+from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -153,6 +154,37 @@ class Review:
             raise ValueError("Evidence note must be text of at most 2,000 characters.")
         self.notes[payment_id] = note
         self.record("evidence_noted", payment_id, note=note)
+
+    def preview_impact(self, payment_id, invoice_ids):
+        """Run the real allocation rules on a copy; never reserve or record a decision."""
+        before = self.state()
+        scenario = deepcopy(self)
+        scenario.approve(payment_id, invoice_ids, True)
+        after = scenario.state()
+        changes = []
+        for original, proposed in zip(before["payments"], after["payments"], strict=True):
+            if original["id"] == payment_id:
+                continue
+            if (original["status"], original["count"]) != (proposed["status"], proposed["count"]):
+                changes.append(
+                    {
+                        "payment_id": original["id"],
+                        "currency": original["currency"],
+                        "amount": original["amount"],
+                        "before_status": original["status"],
+                        "after_status": proposed["status"],
+                        "before_count": original["count"],
+                        "after_count": proposed["count"],
+                    }
+                )
+        return {
+            "version": self.version,
+            "payment_id": payment_id,
+            "invoice_ids": sorted(invoice_ids),
+            "changes": changes,
+            "reserved_count": len(invoice_ids),
+            "preview_only": True,
+        }
 
     def approve(self, payment_id, invoice_ids, acknowledged):
         payment = self.payment(payment_id)

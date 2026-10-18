@@ -216,6 +216,242 @@ async function setFile(p, role, text) {
     .querySelector("#" + role + "-file")
     .dispatchEvent(new p.w.Event("change", { bubbles: true }));
 }
+
+test("guided first payment explains the choice without selecting or confirming for the user", async () => {
+  const p = await page();
+  try {
+    const { w, d } = p;
+    click(w, "#start-demo");
+    assert.equal(d.querySelector("#walkthrough").hidden, false);
+    assert.match(
+      d.querySelector("#walkthrough-title").textContent,
+      /two different explanations/,
+    );
+    assert.equal(
+      d.querySelectorAll('.allocation[aria-pressed="true"]').length,
+      0,
+    );
+    click(w, "#guide-action");
+    click(w, "#guide-action");
+    assert.ok(d.querySelector("#remittance-dialog").open);
+    click(w, "#apply-remittance");
+    await waitFor(
+      () => !d.querySelector("#remittance-dialog").open,
+      "guided evidence saved",
+    );
+    assert.match(
+      d.querySelector("#walkthrough-title").textContent,
+      /You choose/,
+    );
+    assert.equal(
+      d.querySelectorAll('.allocation[aria-pressed="true"]').length,
+      0,
+    );
+    const pair = [...d.querySelectorAll(".allocation")].find(
+      (n) =>
+        n.textContent.includes("INV-001") && n.textContent.includes("INV-002"),
+    );
+    pair.click();
+    await waitFor(
+      () => d.querySelector("#impact-preview").textContent.includes("PAY-005"),
+      "real impact preview",
+    );
+    assert.match(d.querySelector("#allocation-flow").textContent, /INV-002/);
+    assert.match(d.querySelector("#choice-checks").textContent, /2 of 2/);
+    assert.match(d.querySelector("#impact-preview").textContent, /1 → 0/);
+    const before = await (await w.fetch("/api/state")).json();
+    assert.equal(
+      before.history.length,
+      1,
+      "only saving evidence is recorded; preview never writes",
+    );
+    assert.ok(before.invoices.every((i) => !i.reserved));
+    click(w, "#guide-action");
+    assert.equal(d.activeElement.id, "acknowledge");
+    assert.ok(d.querySelector("#approve-button").disabled);
+    click(w, "#acknowledge");
+    click(w, "#approve-button");
+    await waitFor(
+      () => d.querySelector("#stat-reviewed").textContent === "1",
+      "guided confirmation",
+    );
+    assert.match(
+      d.querySelector(".review-result").textContent,
+      /PAY-005: Unmatched/,
+    );
+    assert.match(
+      d.querySelector("#walkthrough-title").textContent,
+      /remain available/,
+    );
+    click(w, "#guide-action");
+    assert.match(d.querySelector("#payment-detail").textContent, /PAY-005/);
+    assert.match(
+      d.querySelector("#candidate-list").textContent,
+      /Keep this one unresolved/,
+    );
+    click(w, "#exit-guide");
+    assert.ok(d.querySelector("#walkthrough").hidden);
+    assert.equal(
+      d.querySelector("#stat-reviewed").textContent,
+      "1",
+      "exiting never resets decisions",
+    );
+    assert.equal(p.errors.length, 0);
+  } finally {
+    p.dispose();
+  }
+});
+
+test("switching alternatives recomputes consequences and never invents evidence", async () => {
+  const p = await page();
+  try {
+    const { w, d } = p;
+    const choose = (ids) =>
+      [...d.querySelectorAll(".allocation")]
+        .find((n) =>
+          ids.every((id) => n.getAttribute("aria-label").includes(id)),
+        )
+        .click();
+    choose(["INV-001", "INV-002"]);
+    choose(["INV-003"]);
+    await waitFor(
+      () =>
+        d
+          .querySelector("#impact-preview")
+          .textContent.includes("No other payment"),
+      "single-invoice preview replaces pair preview",
+    );
+    assert.ok(
+      !d.querySelector("#impact-preview").textContent.includes("PAY-005"),
+    );
+    assert.match(
+      d.querySelector("#choice-checks").textContent,
+      /No saved note/,
+    );
+    assert.match(d.querySelector("#allocation-flow").textContent, /INV-003/);
+    const state = await (await w.fetch("/api/state")).json();
+    assert.equal(state.version, 0);
+    assert.equal(state.history.length, 0);
+    assert.ok(state.invoices.every((i) => !i.reserved));
+    assert.equal(p.errors.length, 0);
+  } finally {
+    p.dispose();
+  }
+});
+
+test("a delayed consequence response cannot overwrite a newer selection", async () => {
+  const p = await page();
+  let release;
+  try {
+    const { w, d } = p;
+    const realFetch = w.fetch;
+    let held = false;
+    const gate = new Promise((resolve) => {
+      release = resolve;
+    });
+    w.fetch = async (path, options) => {
+      const response = await realFetch(path, options);
+      if (
+        path === "/api/impact" &&
+        JSON.parse(options.body).invoice_ids.includes("INV-001")
+      ) {
+        held = true;
+        await gate;
+      }
+      return response;
+    };
+    [...d.querySelectorAll(".allocation")]
+      .find((n) => n.textContent.includes("INV-001"))
+      .click();
+    await waitFor(() => held, "hold pair preview response");
+    [...d.querySelectorAll(".allocation")]
+      .find((n) => n.textContent.includes("INV-003"))
+      .click();
+    await waitFor(
+      () =>
+        d
+          .querySelector("#impact-preview")
+          .textContent.includes("No other payment"),
+      "newer selection preview",
+    );
+    release();
+    await pause(80);
+    assert.ok(
+      !d.querySelector("#impact-preview").textContent.includes("PAY-005"),
+    );
+    assert.match(d.querySelector("#allocation-flow").textContent, /INV-003/);
+    assert.equal(
+      d.querySelectorAll('.allocation[aria-pressed="true"]').length,
+      1,
+    );
+    assert.equal(p.errors.length, 0);
+  } finally {
+    release?.();
+    p.dispose();
+  }
+});
+
+test("a late stale-preview error cannot clear a newer choice or unsaved evidence", async () => {
+  const p = await page();
+  let release;
+  try {
+    const { w, d } = p;
+    const realFetch = w.fetch;
+    let held = false;
+    const gate = new Promise((resolve) => {
+      release = resolve;
+    });
+    w.fetch = async (path, options) => {
+      const isOld =
+        path === "/api/impact" &&
+        JSON.parse(options.body).invoice_ids.includes("INV-001");
+      const sent = isOld
+        ? {
+            ...options,
+            body: JSON.stringify({ ...JSON.parse(options.body), version: -1 }),
+          }
+        : options;
+      const response = await realFetch(path, sent);
+      if (isOld) {
+        assert.equal(response.status, 409);
+        held = true;
+        await gate;
+      }
+      return response;
+    };
+    [...d.querySelectorAll(".allocation")]
+      .find((n) => n.textContent.includes("INV-001"))
+      .click();
+    await waitFor(() => held, "hold real stale-preview error");
+    [...d.querySelectorAll(".allocation")]
+      .find((n) => n.textContent.includes("INV-003"))
+      .click();
+    input(w, "#evidence-note", "Keep my unsaved evidence.");
+    await waitFor(
+      () =>
+        d
+          .querySelector("#impact-preview")
+          .textContent.includes("No other payment"),
+      "current preview",
+    );
+    release();
+    await pause(80);
+    assert.equal(
+      d.querySelector("#evidence-note").value,
+      "Keep my unsaved evidence.",
+    );
+    assert.equal(
+      d.querySelectorAll('.allocation[aria-pressed="true"]').length,
+      1,
+    );
+    assert.ok(!d.querySelector("#decision-lab").hidden);
+    assert.match(d.querySelector("#allocation-flow").textContent, /INV-003/);
+    assert.equal(p.errors.length, 0);
+  } finally {
+    release?.();
+    p.dispose();
+  }
+});
 test("file preview, column mapping and import render untrusted values as text", async () => {
   const p = await page();
   try {

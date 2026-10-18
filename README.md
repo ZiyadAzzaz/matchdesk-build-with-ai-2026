@@ -28,6 +28,8 @@ Open http://127.0.0.1:8503. If that port is occupied: `python -m matchdesk --por
 
 All sample companies, invoices, payments and remittance notes are fictional.
 
+New here? Click **Guide me through it**. The five-step guide explains the problem and takes you through the real controls. It never selects or confirms an allocation for you. You can exit without losing your decisions.
+
 1. Select **PAY-001 · USD 200.00**. The server computes two valid arithmetic groups: **INV-003 (200)** or **INV-001 + INV-002 (75 + 125)**. Neither is chosen automatically.
 2. Click **Read sample remittance**. The fictional note identifies INV-001 and INV-002. Click **Use this evidence note**.
 3. Click the matching two-invoice card. Check **I checked the payer and remittance evidence**, then **Confirm proposed allocation**.
@@ -36,6 +38,8 @@ All sample companies, invoices, payments and remittance notes are fictional.
 6. PAY-002 illustrates one arithmetic candidate, PAY-003 no exact match, and PAY-004 an unidentified customer. Select its matching customer explicitly; amount alone never identifies a payer.
 
 "Reviewed here" means a person confirmed a proposed allocation in this session. It does not prove the payer's identity, authenticate remittance, mark a real invoice paid or post an accounting entry. Exact arithmetic is not transaction identity.
+
+Before confirming, **Understand this choice** connects the payment to selected invoices, shows the equation and original CSV records, and distinguishes saved references from identity verification. Its **If you confirm this choice** preview uses the real allocation rules on a separate copy: choosing 75 + 125 leaves PAY-005 without an available exact group; choosing 200 does not. Try both cards. Previewing never reserves invoices, writes a decision or changes history. After a real confirmation, the result links to payments whose status or candidate count actually changed.
 
 ## Your own CSV exports
 

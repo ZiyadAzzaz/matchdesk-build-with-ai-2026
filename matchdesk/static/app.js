@@ -15,6 +15,10 @@ let selectedGroup = null;
 let importing = {};
 let preview = null;
 let busy = false;
+let guideActive = false;
+let guideCompared = false;
+let impactSequence = 0;
+let lastOutcome = null;
 const noteDrafts = new Map();
 const importReads = new Map();
 const pendingImports = new Set();
@@ -80,9 +84,13 @@ async function request(path, body) {
   });
   const data = await response.json();
   if (!response.ok) {
-    if (response.status === 409) {
+    if (response.status === 409 && path !== "impact") {
       state = await request("state");
       selectedGroup = null;
+      noteDrafts.clear();
+      if (!current()) selectedId = state.payments[0]?.id || null;
+      $("acknowledge").checked = false;
+      lastOutcome = null;
       render();
     }
     throw new Error(data.error || "The request could not be completed.");
@@ -95,8 +103,25 @@ async function mutation(action, body = {}, message = "") {
   $("error").hidden = true;
   $("approve-button").disabled = true;
   try {
+    const before = state;
     state = await request(action, { version: state.version, ...body });
+    if (action === "approve") {
+      lastOutcome = {
+        paymentId: body.payment_id,
+        changes: state.payments.filter((p) => {
+          const previous = before.payments.find((old) => old.id === p.id);
+          return (
+            p.id !== body.payment_id &&
+            previous &&
+            (p.status !== previous.status || p.count !== previous.count)
+          );
+        }),
+      };
+    }
+    if (["undo", "import", "demo"].includes(action)) lastOutcome = null;
     if (["import", "demo"].includes(action)) {
+      guideActive = false;
+      guideCompared = false;
       noteDrafts.clear();
       selectedGroup = null;
       selectedId = state.payments[0]?.id || null;
@@ -204,6 +229,8 @@ function evidenceNames(group, text) {
 }
 
 function renderPayment() {
+  impactSequence += 1;
+  $("decision-lab").hidden = true;
   const payment = current();
   $("payment-detail").replaceChildren();
   $("candidate-list").replaceChildren();
@@ -299,6 +326,35 @@ function renderPayment() {
       ),
     );
     $("candidate-list").append(box);
+    if (lastOutcome?.paymentId === payment.id) {
+      const result = node("div", "review-result");
+      result.append(node("h3", "", "What changed in this batch"));
+      result.append(
+        node(
+          "p",
+          "",
+          `${payment.decision.invoice_ids.length} invoice(s) reserved here. No accounting entry was posted.`,
+        ),
+      );
+      for (const changed of lastOutcome.changes) {
+        const inspect = node(
+          "button",
+          "button small",
+          `${changed.id}: ${labels[changed.status]} · ${changed.count} available group(s)`,
+        );
+        inspect.addEventListener("click", () => selectPayment(changed.id));
+        result.append(inspect);
+      }
+      if (!lastOutcome.changes.length)
+        result.append(
+          node(
+            "p",
+            "",
+            "No other payment's status or candidate count changed.",
+          ),
+        );
+      $("candidate-list").append(result);
+    }
   } else if (!groups.length) {
     const headings = {
       unmatched: "Keep this one unresolved.",
@@ -380,6 +436,19 @@ function renderPayment() {
         ),
       ),
     );
+    button.append(
+      node(
+        "span",
+        "allocation-equation",
+        group.invoice_ids
+          .map((id) => money(state.invoices.find((i) => i.id === id).cents))
+          .join(" + ") +
+          " = " +
+          money(payment.cents) +
+          " " +
+          payment.currency,
+      ),
+    );
     if (evidenceNames(group.invoice_ids, payment.note))
       button.append(
         node(
@@ -404,6 +473,198 @@ function renderPayment() {
         `Showing ${groups.length} of ${payment.count} exact groups. Narrow the invoice source file for a more manageable review.`,
       ),
     );
+  renderChoice(payment);
+}
+
+function selectPayment(id) {
+  if (busy || !state?.payments.some((p) => p.id === id)) return;
+  selectedId = id;
+  selectedGroup = null;
+  $("acknowledge").checked = false;
+  $("payment-filter").value = "all";
+  $("payment-search").value = "";
+  render();
+  $("payment-detail").scrollIntoView({ block: "center", behavior: "smooth" });
+}
+
+function renderChoice(payment) {
+  if (!selectedGroup || payment.status === "reviewed") return;
+  $("decision-lab").hidden = false;
+  const invoices = selectedGroup.map((id) =>
+    state.invoices.find((i) => i.id === id),
+  );
+  const flow = $("allocation-flow");
+  flow.replaceChildren();
+  append(
+    flow,
+    append(
+      node("div", "flow-payment"),
+      node("small", "", "INCOMING PAYMENT"),
+      node("strong", "", `${payment.currency} ${money(payment.cents)}`),
+      node("span", "", payment.id),
+    ),
+    node("span", "flow-arrow", "→"),
+    append(
+      node("div", "flow-invoices"),
+      ...invoices.map((i) =>
+        append(
+          node("div", "flow-invoice"),
+          node("strong", "", i.id),
+          node("span", "", `${i.currency} ${money(i.cents)}`),
+        ),
+      ),
+    ),
+  );
+  const checks = $("choice-checks");
+  checks.replaceChildren();
+  const named = selectedGroup.filter((id) => evidenceNames([id], payment.note));
+  for (const [label, value] of [
+    [
+      "Exact total",
+      `${invoices.map((i) => money(i.cents)).join(" + ")} = ${money(payment.cents)} ${payment.currency}`,
+    ],
+    ["Customer scope", payment.scope_customer + " · reviewer-selected scope"],
+    ["Currency", payment.currency + " throughout · no conversion"],
+    [
+      "Saved evidence",
+      !payment.note
+        ? "No saved note. Check the sender's information before deciding."
+        : `${named.length} of ${selectedGroup.length} selected invoice IDs appear in the note. References are context, not verification.`,
+    ],
+    [
+      "Source records",
+      invoices
+        .map((i) => `${i.id}: invoice CSV record ${i.source_row}`)
+        .join("; "),
+    ],
+  ])
+    append(checks, node("dt", "", label), node("dd", "", value));
+  const target = $("impact-preview");
+  target.replaceChildren(
+    node("p", "", "Checking what this choice would change…"),
+  );
+  const sequence = ++impactSequence;
+  const version = state.version;
+  const group = [...selectedGroup];
+  request("impact", { version, payment_id: payment.id, invoice_ids: group })
+    .then((result) => {
+      if (
+        sequence !== impactSequence ||
+        state.version !== version ||
+        selectedId !== payment.id ||
+        !equalGroup(selectedGroup, group)
+      )
+        return;
+      target.replaceChildren(node("h3", "", "If you confirm this choice"));
+      target.append(
+        node(
+          "p",
+          "",
+          `${result.reserved_count} invoice(s) would become unavailable to other payments in this workspace.`,
+        ),
+      );
+      for (const change of result.changes)
+        target.append(
+          node(
+            "p",
+            "impact-change",
+            `${change.payment_id} · ${change.currency} ${change.amount}: ${change.before_count} → ${change.after_count} available group(s). ${labels[change.before_status]} → ${labels[change.after_status]}.`,
+          ),
+        );
+      if (!result.changes.length)
+        target.append(
+          node(
+            "p",
+            "",
+            "No other payment's status or candidate count would change.",
+          ),
+        );
+      target.append(
+        node(
+          "small",
+          "",
+          "Computed using the same rules as confirmation. Nothing has been reserved yet.",
+        ),
+      );
+    })
+    .catch((error) => {
+      if (sequence === impactSequence) {
+        target.replaceChildren(
+          node("p", "", "Preview unavailable: " + error.message),
+        );
+        const retry = node(
+          "button",
+          "text-button",
+          "Refresh workspace and compare again",
+        );
+        retry.addEventListener("click", refresh);
+        target.append(retry);
+      }
+    });
+}
+
+function guideStep() {
+  const example = state?.payments.find(
+    (p) => p.id === state.sample_remittance?.payment_id,
+  );
+  if (example?.status === "reviewed") return 4;
+  if (!guideCompared) return 0;
+  if (!example?.note) return 1;
+  return selectedId === example.id && selectedGroup ? 3 : 2;
+}
+
+function renderGuide() {
+  $("walkthrough").hidden = !guideActive || !state?.demo;
+  if ($("walkthrough").hidden) return;
+  const step = guideStep();
+  const steps = [
+    "Compare",
+    "Read evidence",
+    "Choose",
+    "Confirm",
+    "See the effect",
+  ];
+  $("guide-steps").replaceChildren(
+    ...steps.map((title, i) => {
+      const item = node(
+        "li",
+        i < step ? "done" : i === step ? "current" : "",
+        `${i + 1}. ${title}`,
+      );
+      if (i === step) item.setAttribute("aria-current", "step");
+      return item;
+    }),
+  );
+  const content = [
+    [
+      "The same $200 fits two different explanations.",
+      "An invoice is a request for payment. This customer's $200 could cover INV-003 alone, or INV-001 + INV-002. Both totals fit; neither tells us the sender's intent.",
+      "Compare the choices",
+    ],
+    [
+      "Find out what the sender intended.",
+      "A remittance is the sender's explanation of a payment. Open the fictional note, read its invoice references, then save it as evidence. This does not select an answer.",
+      "Read sample remittance",
+    ],
+    [
+      "You choose the explanation supported by the note.",
+      "Compare the saved invoice references with both cards. Select a card to inspect its calculation, source records and effect on other payments. The app keeps both alternatives visible.",
+      "Show invoice choices",
+    ],
+    [
+      "Check the consequences before confirming.",
+      "Read “Understand this choice” below the cards. Then check the review acknowledgment and confirm in Your review. An exact amount does not prove that a payment belongs to these invoices.",
+      "Go to my review",
+    ],
+    [
+      "Your decision changes which invoices remain available.",
+      "The selected invoices are reserved locally. Inspect PAY-005 to see its current possibilities, then return to PAY-001 to undo if needed. No real invoice was marked paid.",
+      "Inspect the $75 payment",
+    ],
+  ][step];
+  $("walkthrough-title").textContent = content[0];
+  $("guide-description").textContent = content[1];
+  $("guide-action").textContent = content[2];
 }
 
 function renderInspector() {
@@ -451,6 +712,7 @@ function updateApproval() {
     !$("acknowledge").checked ||
     current()?.status === "reviewed" ||
     $("evidence-note").value !== (current()?.note ?? "");
+  renderGuide();
 }
 function render() {
   if (!state) return;
@@ -728,12 +990,33 @@ for (const id of ["about-button", "limits-button"])
   $(id).addEventListener("click", () => open("about-dialog"));
 $("retry-button").addEventListener("click", refresh);
 $("start-demo").addEventListener("click", () => {
-  selectedId = state.payments[0].id;
-  selectedGroup = null;
-  $("payment-search").value = "";
-  $("payment-filter").value = "all";
-  render();
-  $("payment-detail").scrollIntoView({ block: "center" });
+  if (!state?.demo) return;
+  guideActive = true;
+  guideCompared = false;
+  selectPayment(state.sample_remittance.payment_id);
+  $("walkthrough").scrollIntoView({ block: "center" });
+});
+$("exit-guide").addEventListener("click", () => {
+  guideActive = false;
+  renderGuide();
+});
+$("guide-action").addEventListener("click", () => {
+  const step = guideStep();
+  if (step === 0) {
+    guideCompared = true;
+    renderGuide();
+    $("candidate-list").scrollIntoView({ block: "center" });
+  }
+  if (step === 1) {
+    $("remittance-text").textContent = state.sample_remittance.note;
+    open("remittance-dialog");
+  }
+  if (step === 2) selectPayment(state.sample_remittance.payment_id);
+  if (step === 3) {
+    $("inspector-heading").scrollIntoView({ block: "center" });
+    $("acknowledge").focus();
+  }
+  if (step === 4) selectPayment("PAY-005");
 });
 $("scope-customer").addEventListener("change", async () => {
   if (!$("scope-customer").value) return;

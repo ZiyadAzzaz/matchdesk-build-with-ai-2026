@@ -52,9 +52,10 @@
       <section class="page-heading">
         <div>
           <p class="eyebrow">LESS GUESSWORK. MORE CONTEXT.</p>
-          <h1>Make every match make sense.</h1>
+          <h1>One payment. Which invoices?</h1>
           <p class="subtitle">
-            Compare the possibilities. Keep the evidence. Make the call.
+            A review desk for small businesses: connect incoming payments to the
+            invoices they cover.
           </p>
         </div>
         <div class="heading-actions">
@@ -82,11 +83,40 @@
       <div class="demo-strip" id="demo-strip">
         <span class="sample-tag">SAMPLE WORKSPACE</span>
         <p>
-          These records are fictional. Start with the
-          <strong>USD 200.00</strong> payment to explore a real ambiguity.
+          A customer sent <strong>USD 200.00</strong>. Is it one invoice of 200,
+          or two of 75 + 125? Explore this fictional example.
         </p>
-        <button id="start-demo" class="text-button">Show me →</button>
+        <button id="start-demo" class="button primary">
+          Guide me through it
+        </button>
       </div>
+      <section
+        id="walkthrough"
+        class="walkthrough"
+        aria-labelledby="walkthrough-title"
+        hidden
+      >
+        <div class="walkthrough-header">
+          <span class="sample-tag">GUIDED EXAMPLE</span>
+          <button id="exit-guide" class="text-button">Exit guide</button>
+        </div>
+        <ol
+          id="guide-steps"
+          class="guide-steps"
+          aria-label="Review progress"
+        ></ol>
+        <div class="guide-body">
+          <div>
+            <h2 id="walkthrough-title"></h2>
+            <p id="guide-description"></p>
+          </div>
+          <button id="guide-action" class="button primary"></button>
+        </div>
+        <p class="guide-boundary">
+          Fictional records. You make every selection. This guide does not
+          confirm or change an allocation for you.
+        </p>
+      </section>
       <section class="stats" aria-label="Workspace summary">
         <article>
           <span>Incoming payments</span><strong id="stat-payments">—</strong
@@ -144,6 +174,35 @@
           </div>
           <p id="candidate-explanation" class="muted"></p>
           <div id="candidate-list"></div>
+          <section
+            id="decision-lab"
+            class="decision-lab panel"
+            aria-labelledby="lab-title"
+            hidden
+          >
+            <div class="panel-heading">
+              <h2 id="lab-title">Understand this choice</h2>
+              <span class="sample-tag">BEFORE YOU CONFIRM</span>
+            </div>
+            <div class="lab-body">
+              <div
+                id="allocation-flow"
+                class="allocation-flow"
+                aria-label="Payment to invoice connection"
+              ></div>
+              <dl id="choice-checks" class="choice-checks"></dl>
+              <div
+                id="impact-preview"
+                class="impact-preview"
+                role="status"
+                aria-live="polite"
+              ></div>
+              <p class="field-help">
+                Preview only. Arithmetic and invoice references cannot
+                authenticate who sent a payment.
+              </p>
+            </div>
+          </section>
         </section>
         <aside class="inspector panel" aria-labelledby="inspector-heading">
           <div class="panel-heading">

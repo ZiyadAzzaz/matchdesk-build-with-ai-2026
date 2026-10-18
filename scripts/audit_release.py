@@ -58,6 +58,11 @@ def main():
         review = Review(dataset)
         assert review.state()["payments"][0]["count"] == 2
         note = json.loads(package.read("matchdesk/data/remittance.json"))
+        original = review.export_json()
+        preview = review.preview_impact(note["payment_id"], note["invoice_ids"])
+        assert preview["preview_only"] and preview["changes"][0]["payment_id"] == "PAY-005"
+        assert preview["changes"][0]["after_count"] == 0
+        assert review.export_json() == original
         review.set_note(note["payment_id"], note["note"])
         review.approve(note["payment_id"], note["invoice_ids"], True)
         assert review.state()["payments"][0]["status"] == "reviewed"
@@ -68,8 +73,16 @@ def main():
         assert "<script" not in code_map.lower()
         for path, anchors in (
             ("matchdesk/engine.py", ["def find_candidates("]),
-            ("matchdesk/review.py", ["def approve(", "def export_json("]),
-            ("matchdesk/static/app.js", ["function renderPayment(", "function mutation("]),
+            ("matchdesk/review.py", ["def approve(", "def export_json(", "def preview_impact("]),
+            (
+                "matchdesk/static/app.js",
+                [
+                    "function renderPayment(",
+                    "function mutation(",
+                    "function renderGuide(",
+                    "function renderChoice(",
+                ],
+            ),
         ):
             source = package.read(path).decode()
             assert path in code_map

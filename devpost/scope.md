@@ -27,6 +27,9 @@ An actual ambiguity computed from input rows is resolved after reading a clearly
 ## The POC Boundary
 CSV only, explicit import mappings, bounded subset search, exact cents, one currency per match, exact selected customer scope, local session memory, proposed-allocation exports. No account, subscription, bank connection, ledger write or paid API.
 
+## Comprehension revision
+The participant reported that the project was difficult to understand and authorized the proposed interactive improvements. A guided fictional first payment now explains invoices, remittance, alternatives, review and consequences. Selecting an alternative shows its calculation, source records, evidence references and a read-only scenario computed by the actual confirmation rules. It never chooses a group or confirms for the participant. This improves explainability; user benefit and differentiation remain hypotheses until observed with real users.
+
 ## Explicitly Cut
 PDF/OCR and fuzzy payer guessing: extraction/identity uncertainty. Fees, partials, credits and FX: accounting semantics not established. Automatic posting/payment collection: unauthorized and unnecessary. AI certainty scores: no evidence supporting calibrated confidence. Novelty, time saved, customer adoption and prize predictions: unproven.
 

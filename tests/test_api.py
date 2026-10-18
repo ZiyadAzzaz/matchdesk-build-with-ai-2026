@@ -4,6 +4,29 @@ from matchdesk.review import DATA, DEMO_MAPS
 from matchdesk.server import create_app
 
 
+def test_impact_preview_is_read_only_versioned_and_session_scoped():
+    app = create_app()
+    with TestClient(app) as first, TestClient(app) as second:
+        before = first.get("/api/state").json()
+        body = {
+            "version": before["version"],
+            "payment_id": "PAY-001",
+            "invoice_ids": ["INV-001", "INV-002"],
+        }
+        preview = first.post("/api/impact", json=body)
+        assert preview.status_code == 200 and preview.json()["preview_only"]
+        assert first.get("/api/state").json() == before
+        assert first.get("/api/export.json").json()["history"] == []
+        assert first.post("/api/impact", json={**body, "version": -1}).status_code == 409
+        assert (
+            first.post("/api/impact", json={**body, "invoice_ids": ["INV-001"]}).status_code == 400
+        )
+        assert first.get("/api/impact").status_code == 405
+        first.post("/api/approve", json={**body, "acknowledged": True})
+        second.get("/api/state")
+        assert second.post("/api/impact", json=body).status_code == 200
+
+
 def test_expired_cookie_cannot_mutate_a_new_workspace():
     with TestClient(create_app()) as client:
         client.cookies.set("matchdesk_session", "an-expired-session")

@@ -120,3 +120,31 @@ def test_export_contains_proposals_and_neutralizes_formula_notes():
     output = review.export_csv()
     assert "reviewed_proposal" in output and "'=HYPERLINK" in output
     assert "sha256" in review.export_json() and '"acknowledged": true' in review.export_json()
+
+
+def test_what_if_preview_uses_real_rules_without_changing_review():
+    review = Review()
+    before = review.export_json()
+    pair = review.preview_impact("PAY-001", ["INV-001", "INV-002"])
+    assert pair["preview_only"] is True and pair["reserved_count"] == 2
+    change = next(p for p in pair["changes"] if p["payment_id"] == "PAY-005")
+    assert (change["before_count"], change["after_count"]) == (1, 0)
+    assert change["after_status"] == "unmatched"
+    assert review.preview_impact("PAY-001", ["INV-003"])["changes"] == []
+    assert review.export_json() == before
+    review.approve("PAY-001", ["INV-001", "INV-002"], True)
+    actual = next(p for p in review.state()["payments"] if p["id"] == "PAY-005")
+    assert (actual["count"], actual["status"]) == (change["after_count"], change["after_status"])
+
+
+def test_what_if_rejects_invalid_and_reserved_allocations_without_writes():
+    review = Review()
+    for ids in (["INV-001"], ["missing"], ["INV-003", "INV-003"]):
+        with pytest.raises(ValueError):
+            review.preview_impact("PAY-001", ids)
+    assert review.version == 0 and not review.reserved() and not review.history
+    review.approve("PAY-005", ["INV-001"], True)
+    before = review.export_json()
+    with pytest.raises(Conflict):
+        review.preview_impact("PAY-001", ["INV-001", "INV-002"])
+    assert review.export_json() == before

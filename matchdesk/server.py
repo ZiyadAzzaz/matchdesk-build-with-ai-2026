@@ -52,7 +52,7 @@ def create_app():
         allowed = (
             {"state", "export.json", "export.csv"}
             if request.method == "GET"
-            else {"preview", "demo", "import", "scope", "evidence", "approve", "undo"}
+            else {"preview", "impact", "demo", "import", "scope", "evidence", "approve", "undo"}
         )
         if action not in allowed:
             return JSONResponse(
@@ -98,6 +98,11 @@ def create_app():
                             }
                             for role, table in tables.items()
                         }
+                    )
+                elif action == "impact":
+                    review.check_version(body.get("version"))
+                    response = JSONResponse(
+                        review.preview_impact(body.get("payment_id"), body.get("invoice_ids"))
                     )
                 elif action == "export.json":
                     response = Response(

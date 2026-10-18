@@ -35,6 +35,19 @@ Fast mode explicitly requested. User authorized implementation; personal review 
   Learner check: Load an export and identify any confusing or unsupported step.
   Commit: `Finish import workflow and reproducible handoff`
 
+- [x] **4. Explain the first payment and preview consequences**
+  Becomes usable: Guided example, allocation diagram, source/evidence checks, read-only consequences and observed results.
+  Why now: Participant could not understand the project and requested the proposed interaction improvements.
+  PRD ref: `prd.md > Understand the first decision`, `prd.md > Compare consequences before confirmation`
+  Spec ref: `spec.md > Review state`, `spec.md > Review desk`
+  Build: Guide, real-rules scenario endpoint, comparison panel, linked affected payments and stale-response protection.
+  Verify (mechanical): Preview equals actual consequences without writes; invalid/stale/isolated requests; complete guide; rapid switching and delayed responses.
+  Learner check: Use Guide me through it, compare both groups, inspect the consequences and explain the decision in your own words.
+  Commit: `Explain payment choices with a guided review and consequence preview`
+
+## Participant feedback
+The participant said they did not understand the project and did not consider it strong enough to win. They authorized interactive improvements and delegated mechanical testing. This is actionable comprehension feedback, not acceptance, a user study or a completed personal walkthrough.
+
 ## Hands-on Checkpoints
 - [ ] Participant explores the first usable desk and supplies feedback
 - [ ] Final exploration completed
