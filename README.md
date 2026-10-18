@@ -2,6 +2,8 @@
 
 Compare incoming payments with outstanding invoices, inspect multiple exact allocations, add evidence, and confirm a proposed match without updating any bank or accounting system. The interface is a custom HTML/CSS/JavaScript review desk with a small local Python API. AI assisted the build; runtime matching is deterministic. No API key, account or frontend build step is needed.
 
+Public source: [ZiyadAzzaz/matchdesk-build-with-ai-2026](https://github.com/ZiyadAzzaz/matchdesk-build-with-ai-2026). See [release handoff](devpost/final-handoff.md) for completed checks and remaining demo/submission work.
+
 ## Open the app
 
 In this workspace, **double-click `Start-MatchDesk.cmd`**. It discovers a local `.venv`, an active Conda environment or the existing `zero-dev` environment, verifies the required modules and opens **http://127.0.0.1:8503**. Keep the console window open while using it. `Start-MatchDesk.ps1 -Check` verifies the interpreter without starting a browser or server. Override selection with `MATCHDESK_PYTHON` if necessary.

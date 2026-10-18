@@ -20,14 +20,14 @@ The local build is functional; the competition entry is not yet submitted or ful
 | Actual browser appearance and keyboard/focus behavior | Supported browser discovery returns no connected browser | Inspect real desktop/narrow viewports and native dialogs when available; DOM tests cannot substitute |
 | Useful audience evidence | No genuine freelancer/bookkeeper trial recorded | Follow `usability-check.md`, with permission and fictional data; record actual results |
 | Personal planning review and learning reflection | Draft planning and personal checkpoint records remain honest | Participant reviews the choices and supplies their own reflection; do not invent sign-off |
-| Public source repository | No project remote configured; no publication performed | Inspect final staged content/history, obtain explicit public-publication authorization, create/push and check signed-out access |
+| Public source repository | Completed with explicit authorization | https://github.com/ZiyadAzzaz/matchdesk-build-with-ai-2026 — public access, MIT license, required files and source commit checked without authentication |
 | Public working video | Technical timed shot list ready; no video recorded/uploaded | Record real actions from `recording-checklist.md`, with participant-written narration; watch export and verify public YouTube/Vimeo access |
 | Devpost fields, eligibility and survey | No authenticated form reviewed or personal answers supplied | Participant completes their own required fields, including Skill Pack explanation and age confirmation; check eligibility truthfully |
 | Submit and verify receipt | Not performed | Check repository/video links, required fields and submission status; target October 25 |
 
 The actual cutoff is October 27 at 00:00 Cairo (midnight beginning that date), equivalent to October 26 at 17:00 EDT. Check current official rules/form before submitting. Public hosting is optional; a local working-app recording is acceptable. The source ZIP is not a substitute for a public repository.
 
-GitHub CLI authentication was verified over the network for the active account without displaying its credential. A restricted-network status check initially reported failure; the network-enabled check succeeds. No login repair, repository creation or push was performed. Public publication still requires explicit authorization.
+GitHub CLI authentication was verified over the network for the active account without displaying its credential. A restricted-network status check initially reported failure; the network-enabled check succeeds. The participant then explicitly approved the public repository. Creation/push succeeded, and independent unauthenticated GitHub API checks verified access, license, required planning files, source commit and private-file exclusions. No login repair, video publication, outreach or Devpost submission was performed.
 
 ## Read in this order
 
