@@ -4,11 +4,20 @@ import csv
 import io
 import json
 from copy import deepcopy
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from pathlib import Path
 
-from matchdesk.engine import Dataset, amount, find_candidates, import_dataset
+from matchdesk.engine import (
+    FIELDS,
+    MAX_ROWS,
+    Dataset,
+    amount,
+    find_candidates,
+    import_dataset,
+    parse_rows,
+    read_table,
+)
 
 DATA = Path(__file__).parent / "data"
 DEMO_MAPS = {
@@ -145,6 +154,42 @@ class Review:
             raise ValueError("Choose a customer from the invoice file.")
         self.scopes[payment_id] = customer
         self.record("customer_scope_selected", payment_id, customer=customer)
+
+    def add_record(self, role, values):
+        """Append validated manual input without discarding reviews or CSV provenance."""
+        if role not in FIELDS or not isinstance(values, dict):
+            raise ValueError("Choose an invoice or a payment and complete its fields.")
+        rows = getattr(self.dataset, role)
+        if len(rows) >= MAX_ROWS[role]:
+            raise ValueError(f"This workspace supports at most {MAX_ROWS[role]} {role}.")
+        fields = FIELDS[role]
+        if any(not isinstance(values.get(key, ""), str) for key in fields):
+            raise ValueError("Enter text values in each field.")
+        buffer = io.StringIO(newline="")
+        writer = csv.writer(buffer)
+        writer.writerow(fields)
+        writer.writerow([values.get(key, "") for key in fields])
+        table = read_table(buffer.getvalue(), role)
+        row = parse_rows(table, role, {key: key for key in fields})[0]
+        if any(existing.id == row.id for existing in rows):
+            raise ValueError("That ID already exists. Choose a different ID.")
+        row = replace(row, source_row=0, origin="manual")
+        sources = deepcopy(self.dataset.sources)
+        sources[role]["manual_records"] = sources[role].get("manual_records", 0) + 1
+        self.dataset = replace(self.dataset, **{role: (*rows, row)}, sources=sources)
+        self.record(
+            "manual_record_added",
+            row.id if role == "payments" else "",
+            role=role,
+            record=row.to_dict(),
+        )
+
+    def start_empty(self):
+        sources = {
+            role: {"sha256": None, "records": 0, "mapping": {}, "manual_records": 0}
+            for role in FIELDS
+        }
+        self.replace(Dataset((), (), sources))
 
     def set_note(self, payment_id, note):
         self.payment(payment_id)

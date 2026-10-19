@@ -75,3 +75,12 @@ No personal activity or task-completion outcome is inferred from automated tests
 - Unsaved evidence notes survive candidate selection, and confirmation stays disabled until edited evidence is saved.
 - Connected-browser discovery returned no available browser. DOM interaction tests exercise the actual frontend against an isolated real API server; they do not inspect pixels, responsive layout or the native file chooser.
 - On 19 October, the Windows Computer Use tool supplied actual Chrome desktop observations and screenshots for the core fictional review/preview/confirmation/undo sequence. This supplements the earlier DOM checks; narrow layouts, native file-picker use and comprehensive keyboard/focus behavior remain open. The participant supplied their own recorded voice for the local demo; this is not a completed personal learning reflection or personal app walkthrough.
+
+## 6. Direct invoice/payment entry ? requested 19 October
+- [x] Add accessible invoice/payment form and customer suggestions without requiring CSV files.
+- [x] Add explicit empty-workspace replacement confirmation and useful empty-state controls.
+- [x] Preserve existing decisions, reservations and original CSV hashes; distinguish manual records and creation events.
+- [x] Verify duplicate rejection, exact amounts, revision conflicts, manual-only confirm/undo, session isolation and safe text rendering.
+- [x] Inspect the form in real Chrome and successfully add a fictional invoice; save an actual screenshot.
+- [ ] Participant tries the new form and supplies feedback.
+Planning references: scope.md > Requested refinement; prd.md > Direct entry refinement; spec.md > Direct entry implementation.

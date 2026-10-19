@@ -35,3 +35,6 @@ PDF/OCR and fuzzy payer guessing: extraction/identity uncertainty. Fees, partial
 
 ## Research
 Public complaints and competitor checks were recorded before this build in the parent workspace's `devpost/community-problem-research-2026-10-18.md`. Actual repeated sources: https://www.reddit.com/r/smallbusiness/comments/1sergd6/dealing_with_messy_payment_reconciliation_how_do/ and https://www.reddit.com/r/QuickBooks/comments/1ksckhr/ . Existing substitutes include Xero, ReconLoom and Reconcile Locally. No poster was contacted, and no real records are used.
+
+## Requested refinement ? 19 October
+The participant explicitly requested direct entry of invoices and payments for easier use. Additive manual entry and a confirmed empty-workspace start are included in the existing local review boundary. This does not add general bookkeeping, account creation or persistent storage.

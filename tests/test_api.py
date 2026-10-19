@@ -4,6 +4,108 @@ from matchdesk.review import DATA, DEMO_MAPS
 from matchdesk.server import create_app
 
 
+def test_manual_entries_preserve_reviews_provenance_and_reject_invalid_changes():
+    app = create_app()
+    with TestClient(app) as client, TestClient(app) as other:
+        original = client.get("/api/state").json()
+        reviewed = client.post(
+            "/api/approve",
+            json={
+                "version": original["version"],
+                "payment_id": "PAY-001",
+                "invoice_ids": ["INV-001", "INV-002"],
+                "acknowledged": True,
+            },
+        ).json()
+        record = {"id": "OWN-1", "customer": "My Customer", "currency": "EGP", "amount": "125.50"}
+        added = client.post(
+            "/api/add",
+            json={
+                "version": reviewed["version"],
+                "role": "invoices",
+                "record": record,
+            },
+        )
+        assert added.status_code == 200
+        state = added.json()
+        assert state["payments"][0]["decision"] == reviewed["payments"][0]["decision"]
+        assert [r["id"] for r in state["invoices"] if r["reserved"]] == ["INV-001", "INV-002"]
+        assert state["invoices"][-1]["origin"] == "manual"
+        assert state["invoices"][-1]["source_row"] == 0
+        assert state["sources"]["invoices"]["sha256"] == original["sources"]["invoices"]["sha256"]
+        assert state["sources"]["invoices"]["manual_records"] == 1
+        for bad in (
+            record,
+            {**record, "id": "NEW", "amount": "1.001"},
+            {**record, "id": "NEW", "amount": "-1"},
+        ):
+            assert (
+                client.post(
+                    "/api/add",
+                    json={"version": state["version"], "role": "invoices", "record": bad},
+                ).status_code
+                == 400
+            )
+            assert client.get("/api/state").json() == state
+        assert (
+            client.post(
+                "/api/add",
+                json={"version": original["version"], "role": "payments", "record": record},
+            ).status_code
+            == 409
+        )
+        payment = {**record, "id": "PAY-OWN", "reference": "OWN-1"}
+        result = client.post(
+            "/api/add", json={"version": state["version"], "role": "payments", "record": payment}
+        ).json()
+        assert result["payments"][-1]["candidates"][0]["invoice_ids"] == ["OWN-1"]
+        exported = client.get("/api/export.json").json()
+        assert exported["history"][-1]["record"]["origin"] == "manual"
+        assert not any(r["id"] == "PAY-OWN" for r in other.get("/api/state").json()["payments"])
+
+
+def test_empty_workspace_requires_confirmation_and_supports_manual_only_review():
+    with TestClient(create_app()) as client:
+        state = client.get("/api/state").json()
+        assert client.post("/api/empty", json={"version": state["version"]}).status_code == 400
+        assert client.get("/api/state").json() == state
+        empty = client.post(
+            "/api/empty", json={"version": state["version"], "acknowledged": True}
+        ).json()
+        assert empty["invoices"] == empty["payments"] == []
+        assert empty["demo"] is False
+        assert empty["sources"]["invoices"]["sha256"] is None
+        record = {"id": "I", "customer": "Client", "currency": "USD", "amount": "10"}
+        invoice = client.post(
+            "/api/add", json={"version": empty["version"], "role": "invoices", "record": record}
+        ).json()
+        payment = client.post(
+            "/api/add",
+            json={
+                "version": invoice["version"],
+                "role": "payments",
+                "record": {**record, "id": "P"},
+            },
+        ).json()
+        approved = client.post(
+            "/api/approve",
+            json={
+                "version": payment["version"],
+                "payment_id": "P",
+                "invoice_ids": ["I"],
+                "acknowledged": True,
+            },
+        )
+        assert approved.status_code == 200
+        assert approved.json()["invoices"][0]["reserved"]
+        assert (
+            client.post(
+                "/api/undo", json={"version": approved.json()["version"], "payment_id": "P"}
+            ).json()["invoices"][0]["reserved"]
+            is False
+        )
+
+
 def test_impact_preview_is_read_only_versioned_and_session_scoped():
     app = create_app()
     with TestClient(app) as first, TestClient(app) as second:

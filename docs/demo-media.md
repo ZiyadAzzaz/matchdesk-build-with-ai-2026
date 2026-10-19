@@ -25,3 +25,6 @@ The edit removes idle tool pauses, holds real recorded frames for reading, and e
 Raw voice recordings, transcription model/cache, rendered video files and intermediate files are excluded from Git. The approved narration is part of the uploaded demo. GitHub screenshots do not replace the required video. Signed-out access and the final Devpost submission remain to be confirmed.
 
 See [verification](../devpost/verification.md) and [remaining release requirements](../devpost/submission-readiness.md).
+
+## Direct-entry refinement
+[Add invoice form](screenshots/06-add-invoice.jpg) is an actual Chrome capture of the requested direct-entry feature, using a fictional Example Client and USD 125 invoice. This was added after the uploaded video was recorded; the video does not claim to demonstrate direct entry.

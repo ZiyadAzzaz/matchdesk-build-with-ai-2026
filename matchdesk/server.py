@@ -52,7 +52,18 @@ def create_app():
         allowed = (
             {"state", "export.json", "export.csv"}
             if request.method == "GET"
-            else {"preview", "impact", "demo", "import", "scope", "evidence", "approve", "undo"}
+            else {
+                "preview",
+                "impact",
+                "demo",
+                "import",
+                "scope",
+                "evidence",
+                "approve",
+                "undo",
+                "add",
+                "empty",
+            }
         )
         if action not in allowed:
             return JSONResponse(
@@ -135,6 +146,12 @@ def create_app():
                                 body.get("invoices"), body.get("payments"), mapping
                             )
                             review.replace(dataset)
+                        elif action == "add":
+                            review.add_record(body.get("role"), body.get("record"))
+                        elif action == "empty":
+                            if body.get("acknowledged") is not True:
+                                raise ValueError("Confirm replacing the current workspace.")
+                            review.start_empty()
                         elif action == "scope":
                             review.set_scope(body.get("payment_id"), body.get("customer"))
                         elif action == "evidence":

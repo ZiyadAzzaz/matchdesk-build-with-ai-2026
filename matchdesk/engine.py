@@ -42,6 +42,7 @@ class Row:
     cents: int
     reference: str
     source_row: int
+    origin: str = "csv"
 
     def to_dict(self):
         return {**asdict(self), "amount": amount(self.cents)}

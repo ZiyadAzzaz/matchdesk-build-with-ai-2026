@@ -43,6 +43,9 @@ function money(cents) {
     maximumFractionDigits: 2,
   });
 }
+function sourceLabel(row) {
+  return row.origin === "manual" ? "Manual entry" : `CSV record ${row.source_row}`;
+}
 function pill(status) {
   return node("span", "status " + status, labels[status] || status);
 }
@@ -118,8 +121,9 @@ async function mutation(action, body = {}, message = "") {
         }),
       };
     }
-    if (["undo", "import", "demo"].includes(action)) lastOutcome = null;
-    if (["import", "demo"].includes(action)) {
+    if (["undo", "import", "demo", "empty", "add"].includes(action)) lastOutcome = null;
+    if (action === "add") selectedGroup = null;
+    if (["import", "demo", "empty"].includes(action)) {
       guideActive = false;
       guideCompared = false;
       noteDrafts.clear();
@@ -240,8 +244,11 @@ function renderPayment() {
   $("candidate-list").replaceChildren();
   $("evidence-card").replaceChildren();
   if (!payment) {
+    $("candidate-explanation").textContent = "Add an invoice and a payment using the button above, or import CSVs.";
+    $("candidate-count").textContent = "0 groups";
+    $("evidence-card").hidden = true;
     $("payment-detail").append(
-      node("p", "empty", "Choose a payment to begin."),
+      node("p", "empty", "Your workspace is ready. Add your first invoice, then a payment."),
     );
     return;
   }
@@ -264,7 +271,7 @@ function renderPayment() {
     node(
       "p",
       "detail-meta",
-      `${payment.id} · Original CSV record ${payment.source_row}`,
+      `${payment.id} · ${sourceLabel(payment)}`,
     ),
     node(
       "p",
@@ -414,7 +421,7 @@ function renderPayment() {
         node(
           "small",
           "",
-          `CSV record ${invoice.source_row} · ${invoice.customer}`,
+          `${sourceLabel(invoice)} · ${invoice.customer}`,
         ),
       );
       button.append(
@@ -541,7 +548,7 @@ function renderChoice(payment) {
     [
       "Source records",
       invoices
-        .map((i) => `${i.id}: invoice CSV record ${i.source_row}`)
+        .map((i) => `${i.id}: ${sourceLabel(i)}`)
         .join("; "),
     ],
   ])
@@ -676,7 +683,20 @@ function renderGuide() {
 
 function renderInspector() {
   const payment = current();
-  if (!payment) return;
+  if (!payment) {
+    $("scope-customer").replaceChildren(new Option("Add a payment to begin", ""));
+    $("scope-customer").disabled = true;
+    $("evidence-note").value = "";
+    $("evidence-note").disabled = true;
+    $("save-note").disabled = true;
+    $("selection-summary").textContent = "Add your invoices and a payment to compare them.";
+    $("acknowledge").checked = false;
+    $("acknowledge").disabled = true;
+    $("approve-button").hidden = false;
+    $("approve-button").disabled = true;
+    $("undo-button").hidden = true;
+    return;
+  }
   $("scope-customer").replaceChildren(new Option("Choose a customer…", ""));
   for (const customer of state.customers)
     $("scope-customer").add(new Option(customer, customer));
@@ -724,6 +744,8 @@ function updateApproval() {
 function render() {
   if (!state) return;
   $("demo-strip").hidden = !state.demo;
+  const manualCount = state.invoices.concat(state.payments).filter((r) => r.origin === "manual").length;
+  $("demo-strip").querySelector(".sample-tag").textContent = manualCount ? "EXAMPLE + YOUR ENTRIES" : "SAMPLE WORKSPACE";
   $("rail-count").textContent = String(state.payments.length);
   $("stat-payments").textContent = String(state.payments.length);
   $("stat-reviewed").textContent = String(
@@ -763,7 +785,7 @@ function sources(role) {
   const headers =
     role === "invoices"
       ? [
-          "CSV record",
+          "Source",
           "Invoice ID",
           "Customer",
           "Currency",
@@ -771,9 +793,9 @@ function sources(role) {
           "Review reservation",
         ]
       : [
-          "CSV record",
+          "Source",
           "Payment ID",
-          "Customer in file",
+          "Customer supplied",
           "Currency",
           "Amount",
           "Reference",
@@ -781,18 +803,19 @@ function sources(role) {
   const values = rows.map((r) =>
     role === "invoices"
       ? [
-          r.source_row,
+          sourceLabel(r),
           r.id,
           r.customer,
           r.currency,
           r.amount,
           r.reserved ? "Reserved by reviewed proposal" : "Available",
         ]
-      : [r.source_row, r.id, r.customer, r.currency, r.amount, r.reference],
+      : [sourceLabel(r), r.id, r.customer, r.currency, r.amount, r.reference],
   );
   $("source-table").replaceChildren(table(headers, values));
   $("source-hash").textContent =
-    `${rows.length} ${role} records · SHA256 ${state.sources[role].sha256}. CSV record numbers include the header; they are not PDF page or physical line numbers.`;
+    `${rows.length} ${role} records · ${rows.filter((r) => r.origin === "manual").length} manual entries. ` +
+    (state.sources[role].sha256 ? `Original CSV SHA256 ${state.sources[role].sha256}. Hash covers the imported file only; manual additions are recorded in the decision trail.` : "No CSV imported. Manual entries are recorded in the decision trail.");
   $("source-title").textContent =
     role === "invoices" ? "Outstanding invoices" : "Incoming payments";
   open("source-dialog");
@@ -804,6 +827,7 @@ function history() {
     evidence_noted: "Evidence note saved",
     allocation_reviewed: "Proposed allocation reviewed",
     review_undone: "Review undone",
+    manual_record_added: "Manual record added",
   };
   $("history-list").replaceChildren();
   for (const event of [...state.history].reverse()) {
@@ -822,6 +846,7 @@ function history() {
           event.previous_invoice_ids?.join(" + ") ||
           event.customer ||
           event.note ||
+          (event.record ? `${event.record.id} · ${event.record.customer || "Customer not supplied"} · ${event.record.currency} ${event.record.amount}` : "") ||
           "Dataset loaded into session memory.",
       ),
       node(
@@ -1095,5 +1120,63 @@ $("replace-confirm").addEventListener("change", () => {
   $("commit-import").disabled = !$("replace-confirm").checked;
 });
 $("commit-import").addEventListener("click", commitImport);
+
+function configureAddForm() {
+  const payment = $("add-role").value === "payments";
+  $("add-customer").required = !payment;
+  $("add-customer-optional").hidden = !payment;
+  $("add-reference-field").hidden = !payment;
+  $("add-id").placeholder = payment ? "e.g. PAY-101" : "e.g. INV-101";
+  $("save-record").textContent = payment ? "Add payment" : "Add invoice";
+  $("add-title").textContent = payment ? "Add an incoming payment" : "Add an outstanding invoice";
+  $("add-error").hidden = true;
+}
+$("add-role").addEventListener("change", configureAddForm);
+$("add-button").addEventListener("click", () => {
+  if (!state || busy) return;
+  $("add-form").reset();
+  $("customer-suggestions").replaceChildren(...state.customers.map((name) => new Option(name, name)));
+  $("add-sample-note").hidden = !state.demo;
+  configureAddForm();
+  open("add-dialog");
+});
+$("add-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (busy || !$("add-form").reportValidity()) return;
+  const role = $("add-role").value;
+  const record = {
+    id: $("add-id").value,
+    customer: $("add-customer").value,
+    currency: $("add-currency").value,
+    amount: $("add-amount").value,
+    reference: role === "payments" ? $("add-reference").value : "",
+  };
+  // Preserve drafts while the request runs and prevent a second submission.
+  const controls = [...$("add-form").querySelectorAll("input, select, button")];
+  controls.forEach((control) => { control.disabled = true; });
+  const added = await mutation("add", { role, record }, `${role === "payments" ? "Payment" : "Invoice"} added. Existing reviews were kept.`);
+  controls.forEach((control) => { control.disabled = false; });
+  if (added) {
+    $("payment-search").value = "";
+    $("payment-filter").value = "all";
+    if (role === "payments") selectedId = record.id;
+    render();
+    close("add-dialog");
+    if (role === "payments") $("payment-detail").scrollIntoView({ block: "center" });
+  } else {
+    $("add-error").textContent = $("error-text").textContent;
+    $("add-error").hidden = false;
+  }
+});
+$("empty-button").addEventListener("click", () => open("empty-dialog"));
+$("confirm-empty").addEventListener("click", async () => {
+  if (await mutation("empty", { acknowledged: true }, "Empty workspace ready. Add an invoice, then a payment.")) {
+    $("payment-search").value = "";
+    $("payment-filter").value = "all";
+    render();
+    close("empty-dialog");
+    $("add-button").focus();
+  }
+});
 
 refresh();

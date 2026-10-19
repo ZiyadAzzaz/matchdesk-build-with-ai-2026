@@ -40,3 +40,6 @@ Fictional 200 payment shows 200 versus 75+125 groups. Actual sample evidence nam
 
 ## Deferred and Non-Goals
 No mobile-native app, accounts, live banking, bookkeeping advice, OCR, partial/fee/FX allocation, automated matching approvals or measured commercial impact. Genuine usability/viewport review and participant-authored final materials remain pending until actually completed.
+
+## Direct entry refinement ? 19 October
+A labelled form adds either an outstanding invoice or incoming payment, with customer suggestions, supported-currency selection, exact positive amount and optional payment reference. Invoice customer is required; payment customer may be unknown. Duplicate IDs and invalid inputs leave state intact. Additions preserve reviews, notes and reservations, clear the current candidate selection and recompute matches. A separate confirmation is required before replacing the current workspace with an empty one. Sample-plus-manual data remains explicitly labelled. Manual records and creation history are distinguished from CSV provenance. No editing/deletion or durable storage is added.

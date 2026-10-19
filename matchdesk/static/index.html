@@ -59,11 +59,13 @@
           </p>
         </div>
         <div class="heading-actions">
+          <button class="button primary" id="add-button">+ Add invoice or payment</button>
+          <button class="button" id="empty-button">Start empty</button>
           <button class="button" id="import-button">
             ↑ &nbsp; Import CSVs
           </button>
           <details class="export-menu">
-            <summary class="button primary">↓ &nbsp; Export review</summary>
+            <summary class="button">↓ &nbsp; Export review</summary>
             <div class="menu-content">
               <a href="/api/export.csv" download>Proposed allocations · CSV</a
               ><a href="/api/export.json" download
@@ -256,6 +258,36 @@
         </button>
       </footer>
     </main>
+
+    <dialog id="add-dialog" aria-labelledby="add-title">
+      <div class="dialog-top">
+        <div><p class="eyebrow">NO CSV NEEDED</p><h2 id="add-title">Add a record</h2></div>
+        <button class="close-button" data-close="add-dialog" aria-label="Close add record">×</button>
+      </div>
+      <p class="muted">Add one record at a time. Existing records and reviews stay intact.</p>
+      <p id="add-sample-note" class="field-help">This workspace contains fictional example records. Use “Start empty” first to work with only your own data.</p>
+      <form id="add-form">
+        <div class="entry-grid">
+          <label>What are you adding?<select id="add-role"><option value="invoices">Outstanding invoice</option><option value="payments">Incoming payment</option></select></label>
+          <label>Record ID<input id="add-id" required maxlength="150" placeholder="e.g. INV-101" /></label>
+          <label>Customer <span id="add-customer-optional" class="optional" hidden>optional</span><input id="add-customer" list="customer-suggestions" required maxlength="150" placeholder="Choose or type a customer" /><datalist id="customer-suggestions"></datalist></label>
+          <label>Currency<select id="add-currency"><option>USD</option><option>EGP</option><option>EUR</option><option>GBP</option><option>CAD</option><option>AUD</option></select></label>
+          <label>Amount<input id="add-amount" required inputmode="decimal" maxlength="12" placeholder="e.g. 125.00" /><small class="field-help">Positive amount, up to 2 decimal places. No commas.</small></label>
+          <label id="add-reference-field" hidden>Payment reference <span class="optional">optional</span><input id="add-reference" maxlength="2000" placeholder="Invoice number or payment note" /></label>
+        </div>
+        <p id="add-error" class="inline-error" role="alert" hidden></p>
+        <p class="field-help">Entries stay in this app’s memory and are lost on restart or session expiry. Export JSON to keep a review record.</p>
+        <button type="submit" id="save-record" class="button primary">Add invoice</button>
+        <button type="button" class="button" data-close="add-dialog">Cancel</button>
+      </form>
+    </dialog>
+
+    <dialog id="empty-dialog" aria-labelledby="empty-title">
+      <div class="dialog-top"><h2 id="empty-title">Start an empty workspace?</h2><button class="close-button" data-close="empty-dialog" aria-label="Close empty workspace confirmation">×</button></div>
+      <p>This removes the current records, evidence notes and review decisions from this session. Export your review first if you need to keep it.</p>
+      <button id="confirm-empty" class="button primary">Replace with empty workspace</button>
+      <button class="button" data-close="empty-dialog">Keep current workspace</button>
+    </dialog>
 
     <dialog
       id="import-dialog"

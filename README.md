@@ -1,6 +1,6 @@
 # MatchDesk
 
-A local payment-review workspace for freelancers, bookkeepers and small businesses working from invoice and payment CSV exports. MatchDesk shows which invoice groups fit a payment, lets a person inspect the evidence and consequences, and records their proposed allocation.
+A local payment-review workspace for freelancers, bookkeepers and small businesses working with invoice/payment CSV exports or records entered directly in the app. MatchDesk shows which invoice groups fit a payment, lets a person inspect the evidence and consequences, and records their proposed allocation.
 
 **Project owner and contributor:** [Ziyad Azzaz (@ZiyadAzzaz)](https://github.com/ZiyadAzzaz). Built with AI coding assistance; see [contributors and attribution](AUTHORS.md).
 
@@ -39,6 +39,8 @@ These discussions illustrate a **recurring reported workflow problem**. They are
 
 | Action | What the app actually does |
 |---|---|
+| Add invoices and payments | Use simple forms, customer suggestions, currency selection and optional payment references without preparing CSVs |
+| Start empty | Confirm replacement of the example/current workspace before entering only your own records |
 | Import two CSV files | Preview columns, map fields and reject invalid imports without replacing the current review |
 | Compare possible matches | Compute exact invoice groups within the selected customer and currency |
 | Inspect the reasoning | Show amounts, original CSV records and saved invoice references |
@@ -106,6 +108,21 @@ New here? Click **Guide me through it**. The five-step guide explains the proble
 "Reviewed here" means a person confirmed a proposed allocation in this session. It does not prove the payer's identity, authenticate remittance, mark a real invoice paid or post an accounting entry. Exact arithmetic is not transaction identity.
 
 Before confirming, **Understand this choice** connects the payment to selected invoices, shows the equation and original CSV records, and distinguishes saved references from identity verification. Its **If you confirm this choice** preview uses the real allocation rules on a separate copy: choosing 75 + 125 leaves PAY-005 without an available exact group; choosing 200 does not. Try both cards. Previewing never reserves invoices, writes a decision or changes history. After a real confirmation, the result links to payments whose status or candidate count actually changed.
+
+## Enter your own records without CSVs
+
+1. Click **Start empty** if you want to work without the fictional example. Confirm only after exporting any review you need to keep.
+2. Click **+ Add invoice or payment**, choose **Outstanding invoice**, and enter its ID, customer, currency and outstanding amount.
+3. Open the same form, choose **Incoming payment**, and enter the received amount. Choose/type the customer if known; the payment reference is optional.
+4. The new payment is selected automatically. Compare its invoice groups, inspect evidence and consequences, then confirm or leave it unresolved.
+
+Existing reviews are preserved when adding a record. Duplicate IDs and invalid amounts are rejected without changing the workspace. Customer suggestions come from existing invoices; typing a new name on an invoice adds that customer. A payment without a known invoice customer needs an explicit customer choice before matching.
+
+Manual entries are labelled **Manual entry** in the workspace and source table, and recorded in the decision trail and JSON export. Original CSV hashes continue to describe only the imported files. Adding entries to the example retains its fictional records and displays **EXAMPLE + YOUR ENTRIES**; use **Start empty** to avoid mixing them. The same 200-invoice/60-payment and matching limits apply. Records still live in session memory; there is no database or edit/delete interface.
+
+![Actual form for adding an invoice without a CSV file](docs/screenshots/06-add-invoice.jpg)
+
+The linked video demonstrates the core review workflow before these entry forms were added. It remains accurate for matching, evidence, consequences, confirmation and undo; it does not demonstrate manual entry.
 
 ## Your own CSV exports
 

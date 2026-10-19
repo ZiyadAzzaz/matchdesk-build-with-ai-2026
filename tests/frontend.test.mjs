@@ -652,3 +652,53 @@ test("bad files leave the workspace intact and a changed file invalidates its pr
     p.dispose();
   }
 });
+
+test("manual entry supports empty start, validation, safe text and a complete review", async () => {
+  const p = await page();
+  try {
+    const { w, d } = p;
+    click(w, "#empty-button");
+    click(w, '[data-close="empty-dialog"]');
+    assert.equal(d.querySelector("#stat-payments").textContent, "5");
+    click(w, "#empty-button");
+    click(w, "#confirm-empty");
+    await waitFor(() => d.querySelector("#stat-payments").textContent === "0", "empty workspace");
+    assert.ok(d.querySelector("#approve-button").disabled);
+    assert.ok(d.querySelector("#evidence-note").disabled);
+    const customer = '<img src=x onerror="alert(1)">';
+    async function add(role, id, amount) {
+      click(w, "#add-button");
+      change(w, "#add-role", role);
+      input(w, "#add-id", id);
+      input(w, "#add-customer", customer);
+      input(w, "#add-amount", amount);
+      d.querySelector("#add-form").dispatchEvent(new w.Event("submit", { bubbles: true, cancelable: true }));
+    }
+    await add("invoices", "I-001", "10.00");
+    await waitFor(() => !d.querySelector("#add-dialog").open, "saved invoice");
+    assert.equal(d.querySelector("#stat-invoices").textContent, "1");
+    await add("invoices", "I-001", "10.00");
+    await waitFor(() => !d.querySelector("#add-error").hidden, "duplicate validation");
+    assert.match(d.querySelector("#add-error").textContent, /already exists/);
+    assert.equal(d.querySelector("#add-id").value, "I-001", "invalid entry is retained");
+    click(w, '[data-close="add-dialog"]');
+    await add("payments", "P-001", "10.00");
+    await waitFor(() => d.querySelectorAll(".allocation").length === 1, "manual matching");
+    assert.match(d.querySelector("#payment-detail").textContent, /Manual entry/);
+    assert.equal(d.querySelectorAll("img").length, 0);
+    click(w, ".allocation");
+    await waitFor(() => !d.querySelector("#impact-preview").textContent.includes("Checking"), "preview");
+    change(w, "#acknowledge", "on");
+    d.querySelector("#acknowledge").checked = true;
+    d.querySelector("#acknowledge").dispatchEvent(new w.Event("change", { bubbles: true }));
+    click(w, "#approve-button");
+    await waitFor(() => d.querySelector("#stat-reviewed").textContent === "1", "manual review");
+    click(w, "#nav-sources");
+    assert.match(d.querySelector("#source-table").textContent, /Manual entry/);
+    assert.match(d.querySelector("#source-hash").textContent, /No CSV imported/);
+    click(w, '[data-close="source-dialog"]');
+    click(w, "#nav-history");
+    assert.match(d.querySelector("#history-list").textContent, /Manual record added/);
+    assert.equal(p.errors.length, 0);
+  } finally { p.dispose(); }
+});

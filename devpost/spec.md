@@ -48,3 +48,6 @@ Participant authorized the concept, separate backups and implementation. PRD/spe
 
 ## Sharing and release
 On October 18, the participant explicitly authorized creation and push of the prepared public repository. Source: https://github.com/ZiyadAzzaz/matchdesk-build-with-ai-2026 . Public access, MIT license, required planning documents and commit identity were verified through unauthenticated GitHub API requests. The private learner profile and generated files are excluded. Source publication was performed under that authorization. On 19 October, Ziyad approved the edited demo and reported uploading it: https://youtu.be/xOIa8LFVFh0 . Signed-out playback remains unverified. No outreach or Devpost submission has been performed by the agent.
+
+## Direct entry implementation ? 19 October
+`POST /api/add` is revision-checked and validates a single form record through the existing CSV parser before appending an immutable Row with origin=manual and source_row=0. It preserves original source hashes, tracks manual record counts and records the created values in review history. `POST /api/empty` requires acknowledgement and replaces all session review data with an empty Dataset. Customer suggestions use native datalist controls; all user text is rendered through textContent. JSON exports retain origin and creation history.
