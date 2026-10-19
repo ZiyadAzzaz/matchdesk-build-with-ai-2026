@@ -14,12 +14,14 @@ Captured on 19 October 2026 from the real local MatchDesk app in Chrome on Windo
 
 These are actual app captures. No screen content, invoice amount or review outcome was generated or painted into them. They establish desktop appearance for the captured states, not mobile usability, accessibility certification or customer validation.
 
-## Local narrated video
+## Narrated video
+
+[Watch the uploaded demo on YouTube](https://youtu.be/xOIa8LFVFh0). Ziyad approved the edited video and reported uploading it on 19 October 2026. Signed-out playback has not yet been independently verified; the web fetch tool could not retrieve the YouTube page.
 
 The participant supplied a real voice recording. A local MP4 was prepared from a separate real screen recording of a fresh fictional demo session. The working video shows the alternatives, sample note, saved evidence, selection, preview, acknowledgment, confirmation, affected payment, history, export options, undo, scope explanation and import interface. The CSV file chooser and a new file import are not performed in this take.
 
-The edit removes idle tool pauses, holds real recorded frames for reading, and enlarges the preview area through a camera crop. Matching behavior and screen contents are not simulated. The original voice is retained with modest filtering, loudness balancing, a pitch-preserving 4% pace reduction, and short quiet gaps for export/undo. English captions use speech-derived phrase timings with corrected names, bill/note/app terms and light grammar. A final participant listening check remains appropriate.
+The edit removes idle tool pauses, holds real recorded frames for reading, and enlarges the preview area through a camera crop. Matching behavior and screen contents are not simulated. The original voice is retained with modest filtering, loudness balancing, a pitch-preserving 4% pace reduction, and short quiet gaps for export/undo. English captions use speech-derived phrase timings with corrected names, bill/note/app terms and light grammar. The participant approved the finished video.
 
-Local source recordings, personal voice, transcription model/cache, rendered video and intermediate files are excluded from Git. The MP4 needs public YouTube/Vimeo publication and a checked public URL before the competition entry is ready; GitHub screenshots do not replace the required video. No public video upload or Devpost submission is claimed here.
+Raw voice recordings, transcription model/cache, rendered video files and intermediate files are excluded from Git. The approved narration is part of the uploaded demo. GitHub screenshots do not replace the required video. Signed-out access and the final Devpost submission remain to be confirmed.
 
 See [verification](../devpost/verification.md) and [remaining release requirements](../devpost/submission-readiness.md).

@@ -2,7 +2,7 @@
 
 Start with [final-handoff.md](final-handoff.md) for completed local work, concrete blockers and the technical recording sequence. Unchecked items below are deliberately not represented as completed.
 
-Source publication was explicitly authorized and completed: [public repository](https://github.com/ZiyadAzzaz/matchdesk-build-with-ai-2026). No video publication or Devpost submission performed. Official sources: [rules](https://learn-ai-basics.devpost.com/rules), [overview](https://learn-ai-basics.devpost.com/), [required-question update](https://learn-ai-basics.devpost.com/updates/46821-two-new-questions-on-the-submission-form).
+Source publication was explicitly authorized and completed: [public repository](https://github.com/ZiyadAzzaz/matchdesk-build-with-ai-2026). Ziyad approved the edited demo and reported uploading it: [https://youtu.be/xOIa8LFVFh0](https://youtu.be/xOIa8LFVFh0). Signed-out playback is not yet independently verified. Devpost submission is not confirmed. Official sources: [rules](https://learn-ai-basics.devpost.com/rules), [overview](https://learn-ai-basics.devpost.com/), [required-question update](https://learn-ai-basics.devpost.com/updates/46821-two-new-questions-on-the-submission-form).
 
 - [ ] Participant personally tries the review desk; record actual observations and address failures.
 - [x] Inspect and capture the core fictional review/preview/confirm/undo journey in real desktop Chrome; actual screenshots prepared on 19 October.
@@ -13,7 +13,8 @@ Source publication was explicitly authorized and completed: [public repository](
 - [x] Participant supplies their own recorded voice; local narrated demo and English captions prepared with requested technical editing assistance. No personal learning outcome is inferred from reading a script.
 - [ ] Participant completes final name, description, submission answers, Skill Pack explanation and survey responses; personal claims and reflections must be truthful.
 - [x] Public repository creation/push authorized; history/files inspected, MIT license and scope/prd/spec included. Unauthenticated GitHub API verifies public access and matching commit; heuristic history scan has no flagged findings.
-- [ ] Publish a working short public YouTube/Vimeo demo; check signed-out access. Enter the public repository link in Try it out.
+- [x] Participant approves the edited demo and supplies the uploaded video URL: https://youtu.be/xOIa8LFVFh0 .
+- [ ] Verify signed-out video access and Public visibility; enter the video and public repository links in the submission form.
 - [ ] Recheck deadline and all required fields, including Skill Pack explanation and age confirmation. The stated October 26, 2026 17:00 EDT converts to October 27 00:00 Cairo on that date; finish earlier.
 - [ ] Keep project accessible through judging and verify public links before submitting. No public hosting is needed to record this local app.
 

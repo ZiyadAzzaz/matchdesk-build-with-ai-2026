@@ -6,6 +6,8 @@ A local payment-review workspace for freelancers, bookkeepers and small business
 
 Public source: [ZiyadAzzaz/matchdesk-build-with-ai-2026](https://github.com/ZiyadAzzaz/matchdesk-build-with-ai-2026). See [release handoff](devpost/final-handoff.md) for completed checks and remaining demo/submission work.
 
+**[Watch the 1:52 working demo on YouTube](https://youtu.be/xOIa8LFVFh0)** — narrated by Ziyad Azzaz, with English captions and fictional sample data.
+
 ## What problem does it solve?
 
 An invoice is a request for payment. Receiving money does not always tell a business which invoices the customer intended to pay. A missing reference or several matching amounts can leave a reviewer comparing spreadsheet rows and checking the customer's payment note, also called a remittance.
@@ -24,12 +26,14 @@ A **USD 200.00 payment** fits INV-003 **or** INV-001 + INV-002. Both sums are co
 
 This prototype focuses on one complete review task: import files → compare alternatives → inspect evidence and consequences → confirm → export or undo. Its purpose is to make the reasoning inspectable and prevent the same invoice being reused across locally reviewed allocations. The guided fictional example makes the task approachable without connecting a bank or entering real customer data.
 
-Public discussions informed the problem choice:
+We chose this project after reviewing public discussions where people described the difficulty of connecting incoming payments to the right invoices. Missing references, inconsistent payer names and identical amounts can force people to compare records manually. MatchDesk focuses on the ambiguous-choice part of that workflow: make the alternatives and consequences visible, then let a person decide with evidence.
+
+Examples that informed the problem choice:
 
 - A [small-business Reddit discussion](https://www.reddit.com/r/smallbusiness/comments/1sergd6/dealing_with_messy_payment_reconciliation_how_do/) describes missing invoice references, mismatched payer names and manual cross-checking between records.
 - A [QuickBooks Reddit question](https://www.reddit.com/r/QuickBooks/comments/1ksckhr/) asks how to identify the right customer when several invoices have the same amount.
 
-These are examples of a **recurring reported workflow problem**, not evidence that it is the most common problem on Reddit. They do not validate MatchDesk, measure prevalence or establish time saved. Some issues mentioned in those threads, such as partial payments, remain outside this prototype. See the [evidence and existing-solutions review](docs/problem-evidence.md).
+These discussions illustrate a **recurring reported workflow problem**. They are qualitative motivation, not a representative survey or a trial of MatchDesk. Some issues mentioned in those threads, such as partial payments, remain outside this prototype. See the [evidence and existing-solutions review](docs/problem-evidence.md) for sources, limits and competing tools.
 
 ## What you can do
 
@@ -146,4 +150,4 @@ Activate the intended Python environment first. The frontend tests launch their 
 
 `matchdesk/engine.py` parses and matches; `review.py` owns proposed decisions and exports; `server.py` exposes the local API; `static/` contains the complete browser workspace. Planning records and [reference code map](devpost/app-map.html) are in `devpost/`. The [official Skill Pack](https://github.com/challengepost/learn-ai-basics) was installed in this isolated folder; `skills-lock.json` records its source hashes. Personal profile and local skill installations are excluded from releases. Draft planning status distinguishes delegated implementation from unreported personal review.
 
-See [verification](devpost/verification.md), [recording actions](devpost/recording-checklist.md) and [submission readiness](devpost/submission-readiness.md). Existing tools overlap: this prototype makes no claim of being the first matcher, established market demand, measured savings, institutional approval or a high winning probability. The source repository is public with explicit authorization. Actual desktop screenshots and a local narrated demo are prepared; public video publication and contest submission remain unfinished. Participant feedback, final learning/review activities and participant-written submission materials remain necessary.
+See [verification](devpost/verification.md), [recording actions](devpost/recording-checklist.md) and [submission readiness](devpost/submission-readiness.md). Existing tools cover related tasks; this prototype explores a focused, inspectable review experience. Customer trials and comparable measurements are needed before claiming a usability advantage or time saved. The source and screenshots are published, and Ziyad has supplied the [uploaded demo link](https://youtu.be/xOIa8LFVFh0). Signed-out playback and the final Devpost entry still need confirmation.

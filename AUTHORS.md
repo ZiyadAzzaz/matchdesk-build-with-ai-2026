@@ -4,13 +4,13 @@
 
 [Ziyad Azzaz (@ZiyadAzzaz)](https://github.com/ZiyadAzzaz) is the project owner and contributor. Contributions include project direction, prioritizing a usable review experience, feedback that led to the guided example and clearer explanations, and authorizing the public source release.
 
-On 19 October 2026, Ziyad supplied his own voice recording for the working demo. The requested English script and technical screen/audio edit were prepared with Codex assistance. This records an actual participant contribution without claiming a completed personal learning reflection.
+On 19 October 2026, Ziyad supplied his own voice recording, approved the edited video and uploaded the [working demo](https://youtu.be/xOIa8LFVFh0). The English script and technical screen/audio edit were prepared with Codex assistance.
 
 ## AI development assistance
 
 Codex assisted with research, planning artifacts, implementation, automated tests, debugging and technical documentation under Ziyad's direction. The existing `MatchDesk Build Agent` commits record that assistance. The app's runtime allocation logic uses deterministic checks rather than model inference.
 
-This attribution does not claim completed customer interviews, measured savings or personal learning activities that have not occurred. Source history is retained; contributor credit does not require rewriting earlier commits.
+Source history retains the respective contributor identities. Customer interviews and measured savings are not claimed.
 
 ## Third-party work
 
