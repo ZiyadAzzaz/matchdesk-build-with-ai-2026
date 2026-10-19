@@ -44,6 +44,24 @@ These are examples of a **recurring reported workflow problem**, not evidence th
 
 The interface uses HTML/CSS/JavaScript with a small Python API. Matching is deterministic; no API key, account or frontend build step is needed. Confirmations stay in this workspace: no money moves and no accounting ledger is updated. Established accounting and reconciliation tools already cover related tasks; this is a focused prototype whose usability advantage still needs evaluation.
 
+## Screenshots from the working app
+
+Captured from the real local Chrome workspace using fictional sample data. Open an image at full size to inspect the amounts and evidence.
+
+**Review the incoming payment and its context.**
+
+![MatchDesk review workspace showing the fictional USD 200 payment and batch summary](docs/screenshots/01-review-workspace.jpg)
+
+**Check the evidence and the effect before confirming.** The preview shows that allocating INV-001 + INV-002 would leave PAY-005 without an available group.
+
+![Selected invoices, saved evidence, source records and the real consequence preview for PAY-005](docs/screenshots/03-evidence-and-consequences.jpg)
+
+**Confirm a proposed allocation and see what changed.** The invoices are reserved here; no external accounting entry is posted.
+
+![Confirmed local review showing the reserved invoice pair and PAY-005 becoming unmatched](docs/screenshots/04-confirmed-review.jpg)
+
+Also see [both matching alternatives](docs/screenshots/02-ambiguous-invoice-choices.jpg), the [decision trail](docs/screenshots/05-decision-trail.jpg), and [media capture notes](docs/demo-media.md).
+
 ## Open the app
 
 In this workspace, **double-click `Start-MatchDesk.cmd`**. It discovers a local `.venv`, an active Conda environment or the existing `zero-dev` environment, verifies the required modules and opens **http://127.0.0.1:8503**. Keep the console window open while using it. `Start-MatchDesk.ps1 -Check` verifies the interpreter without starting a browser or server. Override selection with `MATCHDESK_PYTHON` if necessary.
@@ -128,4 +146,4 @@ Activate the intended Python environment first. The frontend tests launch their 
 
 `matchdesk/engine.py` parses and matches; `review.py` owns proposed decisions and exports; `server.py` exposes the local API; `static/` contains the complete browser workspace. Planning records and [reference code map](devpost/app-map.html) are in `devpost/`. The [official Skill Pack](https://github.com/challengepost/learn-ai-basics) was installed in this isolated folder; `skills-lock.json` records its source hashes. Personal profile and local skill installations are excluded from releases. Draft planning status distinguishes delegated implementation from unreported personal review.
 
-See [verification](devpost/verification.md), [recording actions](devpost/recording-checklist.md) and [submission readiness](devpost/submission-readiness.md). Existing tools overlap: this prototype makes no claim of being the first matcher, established market demand, measured savings, institutional approval or a high winning probability. The source repository is public with explicit authorization; no public video or contest submission has been completed. Participant feedback, final learning/review activities and participant-written submission materials remain necessary.
+See [verification](devpost/verification.md), [recording actions](devpost/recording-checklist.md) and [submission readiness](devpost/submission-readiness.md). Existing tools overlap: this prototype makes no claim of being the first matcher, established market demand, measured savings, institutional approval or a high winning probability. The source repository is public with explicit authorization. Actual desktop screenshots and a local narrated demo are prepared; public video publication and contest submission remain unfinished. Participant feedback, final learning/review activities and participant-written submission materials remain necessary.

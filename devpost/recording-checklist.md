@@ -1,5 +1,7 @@
 # Technical recording actions — not narration
 
+Update, 19 October: real desktop footage and the participant's supplied voice have been edited into a local narrated MP4 with English captions. This shot list remains a planning reference; see `../docs/demo-media.md` and `verification.md` for the actual captured scope and checks. Public upload and participant listening approval remain open.
+
 The participant writes their own final narration/name/submission under the Skill Pack. This document identifies actual actions, not a script to read or invented outcomes.
 
 1. Open 8503 with the fictional sample visible. Establish the intended reviewer and task in your own words. The optional Guide me through it explains the first payment through the real controls; do not spend the whole recording on the guide.

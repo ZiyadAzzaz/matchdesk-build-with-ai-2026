@@ -1,4 +1,4 @@
-# MatchDesk handoff — 18 October 2026
+# MatchDesk handoff — updated 19 October 2026
 
 The local build is functional; the competition entry is not yet submitted or fully verified. No award, customer validation or finished personal learning activity is claimed.
 
@@ -11,17 +11,19 @@ The local build is functional; the competition entry is not yet submitted or ful
 - 29 backend tests and 10 frontend DOM interaction tests. Frontend tests use the real local API; they do not render pixels or certify accessibility.
 - Focus is restored to selected payment/allocation buttons after they are replaced. A newer evidence draft survives an older in-flight save and blocks confirmation until explicitly saved.
 - Reproducible dependencies, launcher, license, planning documents and source archive checks.
+- Actual desktop Chrome core journey inspected and captured on 19 October, with five screenshots for the public repository.
+- Participant-supplied voice edited with real app footage into a 112.333-second, 1080p H.264/AAC demo with 27 English caption cues. Local delivery: `.dist/demo-delivery/MatchDesk-demo-Ziyad-Azzaz.mp4`. Public video URL is still pending.
 - Read-only full reachable-history audit helper: `python -m scripts.audit_publication`. Its JSON report is saved under ignored `.dist/`; it prints no matched secret contents and contacts no remote. Heuristic scans supplement, not replace, context review.
 
 ## Remaining work and why
 
 | Item | Status / dependency | Next concrete action |
 |---|---|---|
-| Actual browser appearance and keyboard/focus behavior | Supported browser discovery returns no connected browser | Inspect real desktop/narrow viewports and native dialogs when available; DOM tests cannot substitute |
+| Actual browser appearance and keyboard/focus behavior | Core desktop Chrome workflow inspected and captured on 19 October; screenshots prepared | Narrow/mobile layout, native file chooser and comprehensive keyboard/focus behavior remain open |
 | Useful audience evidence | No genuine freelancer/bookkeeper trial recorded | Follow `usability-check.md`, with permission and fictional data; record actual results |
 | Personal planning review and learning reflection | Draft planning and personal checkpoint records remain honest | Participant reviews the choices and supplies their own reflection; do not invent sign-off |
 | Public source repository | Completed with explicit authorization | https://github.com/ZiyadAzzaz/matchdesk-build-with-ai-2026 — public access, MIT license, required files and source commit checked without authentication |
-| Public working video | Technical timed shot list ready; no video recorded/uploaded | Record real actions from `recording-checklist.md`, with participant-written narration; watch export and verify public YouTube/Vimeo access |
+| Public working video | Real desktop footage and participant-supplied voice edited into a local narrated demo with English captions | Participant checks the final voice/video; publish the approved MP4 publicly to YouTube/Vimeo and verify signed-out access |
 | Devpost fields, eligibility and survey | No authenticated form reviewed or personal answers supplied | Participant completes their own required fields, including Skill Pack explanation and age confirmation; check eligibility truthfully |
 | Submit and verify receipt | Not performed | Check repository/video links, required fields and submission status; target October 25 |
 
