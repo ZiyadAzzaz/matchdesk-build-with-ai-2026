@@ -43,7 +43,7 @@ These discussions illustrate a **recurring reported workflow problem**. They are
 | Start empty | Confirm replacement of the example/current workspace before entering only your own records |
 | Import two CSV files | Preview columns, map fields and reject invalid imports without replacing the current review |
 | Compare possible matches | Compute exact invoice groups within the selected customer and currency |
-| Inspect the reasoning | Show amounts, original CSV records and saved invoice references |
+| Inspect the reasoning | Show amounts, CSV/manual source records and saved invoice references |
 | Preview a decision | Apply the actual allocation rules to a copy and show affected payments without reserving anything |
 | Confirm or undo | Require a human acknowledgment, reserve invoices locally, and keep a decision trail |
 | Export the review | Download proposed allocations as CSV or detailed evidence/history as JSON |
@@ -56,7 +56,7 @@ Captured from the real local Chrome workspace using fictional sample data. Open 
 
 **Review the incoming payment and its context.**
 
-![MatchDesk review workspace showing the fictional USD 200 payment and batch summary](docs/screenshots/01-review-workspace.jpg)
+![Current MatchDesk workspace with direct entry, start-empty, import and export controls](docs/screenshots/07-direct-entry-workspace.jpg)
 
 **Check the evidence and the effect before confirming.** The preview shows that allocating INV-001 + INV-002 would leave PAY-005 without an available group.
 
@@ -120,7 +120,17 @@ Existing reviews are preserved when adding a record. Duplicate IDs and invalid a
 
 Manual entries are labelled **Manual entry** in the workspace and source table, and recorded in the decision trail and JSON export. Original CSV hashes continue to describe only the imported files. Adding entries to the example retains its fictional records and displays **EXAMPLE + YOUR ENTRIES**; use **Start empty** to avoid mixing them. The same 200-invoice/60-payment and matching limits apply. Records still live in session memory; there is no database or edit/delete interface.
 
+**Add an invoice with a simple form.**
+
 ![Actual form for adding an invoice without a CSV file](docs/screenshots/06-add-invoice.jpg)
+
+**Add an incoming payment, with an optional customer and payment reference.**
+
+![Actual completed incoming-payment form with fictional USD 125 payment](docs/screenshots/08-add-payment.jpg)
+
+**See the result immediately.** The new payment is selected and labelled Manual entry; it has one arithmetic candidate, which still requires a human review.
+
+![Manually added USD 125 payment with INV-002 shown as a possible match](docs/screenshots/09-manual-payment-match.jpg)
 
 The linked video demonstrates the core review workflow before these entry forms were added. It remains accurate for matching, evidence, consequences, confirmation and undo; it does not demonstrate manual entry.
 

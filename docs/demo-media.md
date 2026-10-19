@@ -11,6 +11,10 @@ Captured on 19 October 2026 from the real local MatchDesk app in Chrome on Windo
 | [Evidence and consequences](screenshots/03-evidence-and-consequences.jpg) | Saved sample evidence, source-record references and the real-rule preview showing the change to PAY-005 |
 | [Confirmed review](screenshots/04-confirmed-review.jpg) | Locally reserved invoices, the confirmed pair and the actual affected payment |
 | [Decision trail](screenshots/05-decision-trail.jpg) | Evidence-save and review events recorded by the app |
+| [Add an invoice](screenshots/06-add-invoice.jpg) | Direct entry with ID, customer, currency and amount |
+| [Updated workspace](screenshots/07-direct-entry-workspace.jpg) | Current Add invoice or payment, Start empty, Import and Export controls |
+| [Add a payment](screenshots/08-add-payment.jpg) | Completed incoming-payment form with optional customer and reference |
+| [Manual payment result](screenshots/09-manual-payment-match.jpg) | The created payment labelled Manual entry and its one exact arithmetic candidate |
 
 These are actual app captures. No screen content, invoice amount or review outcome was generated or painted into them. They establish desktop appearance for the captured states, not mobile usability, accessibility certification or customer validation.
 
@@ -28,3 +32,5 @@ See [verification](../devpost/verification.md) and [remaining release requiremen
 
 ## Direct-entry refinement
 [Add invoice form](screenshots/06-add-invoice.jpg) is an actual Chrome capture of the requested direct-entry feature, using a fictional Example Client and USD 125 invoice. This was added after the uploaded video was recorded; the video does not claim to demonstrate direct entry.
+
+The three latest images were captured in actual Chrome on 19 October after direct entry was implemented. A fictional MY-PAY-101 payment for USD 125 was submitted through the UI and appeared with INV-002 as a possible match. No allocation was confirmed in this additional capture. Original example records remained present and the workspace displayed EXAMPLE + YOUR ENTRIES.

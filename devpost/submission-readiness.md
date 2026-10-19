@@ -19,3 +19,11 @@ Source publication was explicitly authorized and completed: [public repository](
 - [ ] Keep project accessible through judging and verify public links before submitting. No public hosting is needed to record this local app.
 
 The criteria are equally weighted Design, Potential Impact, Innovation/Idea and Presentation under the full rules. The working prototype and automated checks do not establish a winning score. The optional October 22 live review is a feedback opportunity, not a guaranteed selection; any community post is participant-written and no messages have been sent.
+
+## Repository package checks ? 19 October
+- [x] Direct invoice/payment entry documented with no-CSV instructions and session-memory boundary.
+- [x] Actual invoice/payment forms and created-payment match captured; README and nine-image gallery updated.
+- [x] Working demo URL, public source URL, owner credit, MIT license, setup and planning files included.
+- [x] Latest application verification: 31 backend tests, 11 frontend tests, Ruff and JavaScript syntax checks pass.
+
+The repository is prepared for linking in the entry. This does not complete the participant's form, survey, eligibility confirmation or signed-out video check. Further customer trials and broader device/accessibility checks are useful evaluation work, not additional invented contest submission requirements.

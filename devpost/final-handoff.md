@@ -8,7 +8,7 @@ The local build is functional; the competition entry is not yet submitted or ful
 - Visible calculation, customer/currency scope, source records and saved-note references.
 - Real-rule, read-only consequence preview; actual consequences, affected-payment navigation and undo.
 - Atomic CSV preview/mapping/import, source inspection and CSV/JSON exports.
-- 29 backend tests and 10 frontend DOM interaction tests. Frontend tests use the real local API; they do not render pixels or certify accessibility.
+- 31 backend tests and 11 frontend DOM interaction tests, including direct entry and empty-workspace flows. Frontend tests use the real local API; they do not render pixels or certify accessibility.
 - Focus is restored to selected payment/allocation buttons after they are replaced. A newer evidence draft survives an older in-flight save and blocks confirmation until explicitly saved.
 - Reproducible dependencies, launcher, license, planning documents and source archive checks.
 - Actual desktop Chrome core journey inspected and captured on 19 October, with five screenshots for the public repository.
@@ -40,3 +40,6 @@ GitHub CLI authentication was verified over the network for the active account w
 5. `submission-readiness.md` — remaining eligibility/publication/submission checks.
 
 Official sources: [rules](https://learn-ai-basics.devpost.com/rules), [required-field update](https://learn-ai-basics.devpost.com/updates/46821-two-new-questions-on-the-submission-form), [event resources](https://learn-ai-basics.devpost.com/resources).
+
+## Direct entry and current screenshots
+Users can add invoices/payments without CSVs or start empty after explicit replacement confirmation. Existing decisions and imported-file hashes are preserved when adding records. Nine actual app images are published in docs/screenshots, including direct invoice entry, payment entry and the resulting manual payment candidate. See README.md for the no-CSV trial path. The video covers the core workflow before these new controls were added.
